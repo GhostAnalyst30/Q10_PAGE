@@ -15,7 +15,8 @@ export default function AdminStatsPage() {
   const { data: stats, isLoading } = useQuery<AdminStats>({
     queryKey: ["admin-stats"],
     queryFn: () => adminService.getStats(),
-    refetchInterval: 10000,
+    refetchInterval: 60000,
+    staleTime: 30000,
   });
 
   if (isLoading) {

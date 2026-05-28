@@ -16,8 +16,9 @@ export async function createApp() {
   app.use(helmet());
   app.use(cookieParser());
 
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: [frontendUrl, 'http://localhost:3000', 'http://localhost:4000'].filter(Boolean),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -48,7 +49,7 @@ async function bootstrap() {
 
   logger.log(`API running on http://localhost:${port}`);
   logger.log(`Environment: ${isProduction ? 'production' : 'development'}`);
-  logger.log(`Frontend origin: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+  logger.log(`Frontend origin: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
 
   const signals = ['SIGINT', 'SIGTERM'];
   for (const signal of signals) {

@@ -42,8 +42,10 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+    const isCrossOrigin = process.env.NODE_ENV === 'production';
+    const opts = { httpOnly: true, secure: isCrossOrigin, sameSite: isCrossOrigin ? 'none' as const : 'lax' as const, path: '/' };
+    res.clearCookie('access_token', opts);
+    res.clearCookie('refresh_token', opts);
     return { message: 'Sesión cerrada' };
   }
 
@@ -97,20 +99,20 @@ export class AuthController {
   }
 
   private setTokenCookies(res: Response, accessToken: string, refreshToken: string) {
-    const isProduction = process.env.NODE_ENV === 'production';
+    const isCrossOrigin = process.env.NODE_ENV === 'production';
 
     res.cookie('access_token', accessToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'strict' : 'lax',
+      secure: isCrossOrigin,
+      sameSite: isCrossOrigin ? 'none' : 'lax',
       maxAge: 15 * 60 * 1000,
       path: '/',
     });
 
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'strict' : 'lax',
+      secure: isCrossOrigin,
+      sameSite: isCrossOrigin ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     });

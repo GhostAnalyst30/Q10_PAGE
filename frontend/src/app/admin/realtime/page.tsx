@@ -9,6 +9,7 @@ import { formatPrice } from "@/lib/utils";
 import { Users, BookOpen, DollarSign, ShoppingCart, Activity, UserCheck, UserX, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 export default function AdminRealtimePage() {
   const { user } = useAuth();
@@ -22,8 +23,6 @@ export default function AdminRealtimePage() {
   useEffect(() => {
     if (!isSuperAdmin) return;
     loadData();
-    const interval = setInterval(loadData, 5000);
-    return () => clearInterval(interval);
   }, [isSuperAdmin]);
 
   async function loadData() {
@@ -63,12 +62,15 @@ export default function AdminRealtimePage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Activity className="h-6 w-6 text-green-400" />
-          <h2 className="text-2xl font-bold">Monitor en Tiempo Real</h2>
+          <h2 className="text-2xl font-bold">Monitor</h2>
         </div>
         <div className="flex items-center gap-2">
-          <RefreshCw className="h-4 w-4 text-muted-foreground animate-spin-slow" />
+          <Button variant="outline" size="sm" onClick={loadData} disabled={loading} className="gap-1">
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            Actualizar
+          </Button>
           <span className="text-xs text-muted-foreground">
-            Actualizado: {lastUpdate.toLocaleTimeString("es-CO")}
+            {lastUpdate.toLocaleTimeString("es-CO")}
           </span>
         </div>
       </div>

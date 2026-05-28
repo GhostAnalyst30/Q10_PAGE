@@ -49,3 +49,6 @@ coverage/
 
 # Docker sensitive files
 docker-compose.override.yml
+
+.vercel
+.env*

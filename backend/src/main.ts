@@ -1,12 +1,13 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+export async function createApp() {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
   });
 
@@ -16,7 +17,7 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -32,9 +33,31 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  const port = process.env.PORT || 4000;
+  return app;
+}
+
+async function bootstrap() {
+  const logger = new Logger('Bootstrap');
+
+  const app = await createApp();
+
+  const isProduction = process.env.NODE_ENV === 'production';
+  const port = process.env.PORT || 3000;
+
   await app.listen(port);
-  console.log(`Q10 Courses API running on http://localhost:${port}`);
+
+  logger.log(`API running on http://localhost:${port}`);
+  logger.log(`Environment: ${isProduction ? 'production' : 'development'}`);
+  logger.log(`Frontend origin: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+
+  const signals = ['SIGINT', 'SIGTERM'];
+  for (const signal of signals) {
+    process.on(signal, async () => {
+      logger.log(`Received ${signal}, shutting down gracefully...`);
+      await app.close();
+      process.exit(0);
+    });
+  }
 }
 
 bootstrap();

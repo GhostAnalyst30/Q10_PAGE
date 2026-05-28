@@ -13,12 +13,14 @@ import {
   Settings,
   LogOut,
   ShoppingCart,
+  Key,
 } from "lucide-react";
 
 const sidebarLinks = [
   { href: "/dashboard/my-courses", label: "Mis Cursos", icon: BookOpen },
   { href: "/dashboard/cart", label: "Carrito", icon: ShoppingCart },
   { href: "/dashboard/purchases", label: "Compras", icon: CreditCard },
+  { href: "/dashboard/credentials", label: "Credenciales", icon: Key },
   { href: "/dashboard/profile", label: "Perfil", icon: User },
   { href: "/dashboard/settings", label: "Configuración", icon: Settings },
 ];

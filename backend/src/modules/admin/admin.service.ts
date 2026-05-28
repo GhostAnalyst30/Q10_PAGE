@@ -106,6 +106,8 @@ export class AdminService {
           role: true,
           isActive: true,
           createdAt: true,
+          q10User: true,
+          q10Pass: true,
           _count: { select: { enrollments: true } },
         },
       }),
@@ -218,6 +220,16 @@ export class AdminService {
     return { message: 'Correo de credenciales enviado' };
   }
 
+  async sendCredentialEmailWithPassword(userId: string, password: string, key: string) {
+    this.verifySuperAdminKey(key);
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+
+    await this.emailService.sendCredentialEmail(user.email, user.name, password);
+    return { message: 'Correo de credenciales enviado con contraseña' };
+  }
+
   async updateQ10Link(courseId: string, q10Link: string, key: string) {
     this.verifySuperAdminKey(key);
 
@@ -229,5 +241,44 @@ export class AdminService {
       data: { q10Link },
       select: { id: true, title: true, q10Link: true },
     });
+  }
+
+  async updateQ10UserCredentials(userId: string, q10User: string, q10Pass: string, key: string) {
+    this.verifySuperAdminKey(key);
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { q10User, q10Pass },
+      select: { id: true, name: true, email: true, q10User: true, q10Pass: true },
+    });
+  }
+
+  async sendQ10CredentialsEmail(userId: string, key: string) {
+    this.verifySuperAdminKey(key);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        enrollments: {
+          where: { paymentStatus: 'APPROVED' },
+          include: { course: { select: { title: true, q10Link: true } } },
+        },
+      },
+    });
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+    if (!user.q10User || !user.q10Pass) {
+      throw new BadRequestException('El usuario no tiene credenciales Q10 configuradas');
+    }
+
+    const courses = user.enrollments.map(e => ({
+      title: e.course.title,
+      link: e.course.q10Link,
+    }));
+
+    await this.emailService.sendQ10CredentialsEmail(user.email, user.name, user.q10User, user.q10Pass, courses);
+    return { message: 'Credenciales Q10 enviadas por correo' };
   }
 }

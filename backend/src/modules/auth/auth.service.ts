@@ -163,6 +163,8 @@ export class AuthService {
         email: true,
         role: true,
         createdAt: true,
+        q10User: true,
+        q10Pass: true,
       },
     });
   }

@@ -1,15 +1,58 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+interface EmailProvider {
+  send(to: string, subject: string, html: string): Promise<void>;
+}
+
+class ResendProvider implements EmailProvider {
+  private readonly logger = new Logger('ResendProvider');
+
+  constructor(
+    private apiKey: string,
+    private from: string,
+  ) {}
+
+  async send(to: string, subject: string, html: string): Promise<void> {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ from: this.from, to, subject, html }),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      this.logger.error(`Resend error ${res.status}: ${text}`);
+      throw new Error(`Resend API error: ${res.statusText}`);
+    }
+  }
+}
+
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
+  private provider: EmailProvider | null = null;
 
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: ConfigService) {
+    this.initProvider();
+  }
+
+  private initProvider() {
+    const apiKey = this.configService.get('RESEND_API_KEY');
+    if (apiKey && apiKey !== 're_...') {
+      const from = this.configService.get('EMAIL_FROM') || 'noreply@q10courses.com';
+      this.provider = new ResendProvider(apiKey, from);
+      this.logger.log('Email provider: Resend');
+    } else {
+      this.logger.warn('No valid RESEND_API_KEY — emails will be simulated (check .env)');
+    }
+  }
 
   async sendWelcomeEmail(email: string, name: string) {
     const html = this.getWelcomeTemplate(name);
-    await this.sendEmail(email, '¡Bienvenido a Q10 Courses!', html);
+    await this.trySend(email, '¡Bienvenido a Q10 Courses!', html);
   }
 
   async sendPurchaseConfirmation(
@@ -19,74 +62,89 @@ export class EmailService {
     courseLink?: string,
   ) {
     const html = this.getPurchaseTemplate(name, courseTitle, courseLink);
-    await this.sendEmail(email, `¡Compra exitosa! Accede a ${courseTitle}`, html);
+    await this.trySend(email, `¡Compra exitosa! Accede a ${courseTitle}`, html);
   }
 
   async sendPasswordResetEmail(email: string, token: string) {
     const resetUrl = `${this.configService.get('FRONTEND_URL')}/reset-password?token=${token}`;
     const html = this.getResetPasswordTemplate(resetUrl);
-    await this.sendEmail(email, 'Recuperación de contraseña', html);
+    await this.trySend(email, 'Recuperación de contraseña', html);
   }
 
-  async sendCredentialEmail(email: string, name: string) {
+  async sendCredentialEmail(email: string, name: string, password?: string) {
     const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:3000';
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head><meta charset="utf-8"></head>
-      <body style="font-family: 'Inter', Arial, sans-serif; background: #0a0a0a; color: #fafafa; margin: 0; padding: 0;">
-        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-          <div style="text-align: center; margin-bottom: 32px;">
-            <h1 style="font-size: 28px; font-weight: 800; background: linear-gradient(135deg, #a855f7, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;">Q10 Courses</h1>
-          </div>
-          <div style="background: #1a1a1a; border-radius: 16px; padding: 40px; border: 1px solid #2a2a2a;">
-            <h2 style="font-size: 24px; font-weight: 700; margin: 0 0 8px;">Tus Credenciales de Acceso</h2>
-            <p style="color: #a0a0a0; line-height: 1.6; margin: 16px 0;">Hola ${name},</p>
-            <p style="color: #a0a0a0; line-height: 1.6;">Un administrador ha configurado tu acceso a la plataforma Q10 Courses. Puedes iniciar sesión usando el siguiente enlace:</p>
-            <a href="${frontendUrl}/login" style="display: inline-block; background: linear-gradient(135deg, #a855f7, #3b82f6); color: #fff; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-weight: 600; font-size: 16px; margin-top: 16px;">Iniciar Sesión</a>
-            <p style="color: #525252; font-size: 14px; margin-top: 24px;">Si no solicitaste este acceso, ignora este correo.</p>
-          </div>
-          <p style="color: #525252; font-size: 12px; text-align: center; margin-top: 32px;">© 2026 Q10 Courses</p>
-        </div>
-      </body>
-      </html>
-    `;
-    await this.sendEmail(email, 'Tus credenciales de acceso - Q10 Courses', html);
+    const html = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:'Inter',Arial,sans-serif;background:#0a0a0a;color:#fafafa;margin:0;padding:0;">
+<div style="max-width:600px;margin:0 auto;padding:40px 20px;">
+<div style="text-align:center;margin-bottom:32px;">
+<h1 style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#a855f7,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:0;">Q10 Courses</h1>
+</div>
+<div style="background:#1a1a1a;border-radius:16px;padding:40px;border:1px solid #2a2a2a;">
+<h2 style="font-size:24px;font-weight:700;margin:0 0 8px;">Tus Credenciales de Acceso</h2>
+<p style="color:#a0a0a0;line-height:1.6;margin:16px 0;">Hola ${name},</p>
+<p style="color:#a0a0a0;line-height:1.6;">Se han configurado tus credenciales para la plataforma Q10 Courses:</p>
+<div style="background:#0a0a0a;border-radius:12px;padding:20px;margin:16px 0;">
+<p style="margin:4px 0;color:#a0a0a0;">📧 <strong style="color:#fafafa;">Email:</strong> ${email}</p>
+${password ? `<p style="margin:4px 0;color:#a0a0a0;">🔑 <strong style="color:#fafafa;">Contraseña:</strong> ${password}</p>` : ''}
+</div>
+<a href="${frontendUrl}/login" style="display:inline-block;background:linear-gradient(135deg,#a855f7,#3b82f6);color:#fff;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:600;font-size:16px;margin-top:16px;">Iniciar Sesión</a>
+<p style="color:#525252;font-size:14px;margin-top:24px;">Si no solicitaste este acceso, ignora este correo.</p>
+</div>
+<p style="color:#525252;font-size:12px;text-align:center;margin-top:32px;">© 2026 Q10 Courses</p>
+</div>
+</body>
+</html>`;
+    await this.trySend(email, 'Tus credenciales de acceso - Q10 Courses', html);
+  }
+
+  async sendQ10CredentialsEmail(email: string, name: string, q10User: string, q10Pass: string, courses: { title: string; link: string | null }[]) {
+    const courseList = courses.map(c =>
+      `<p style="margin:4px 0;color:#a0a0a0;">📚 ${c.title} — ${c.link ? `<a href="${c.link}" style="color:#a855f7;">Ir al curso</a>` : '<span style="color:#525252;">Sin enlace</span>'}</p>`
+    ).join('');
+
+    const html = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:'Inter',Arial,sans-serif;background:#0a0a0a;color:#fafafa;margin:0;padding:0;">
+<div style="max-width:600px;margin:0 auto;padding:40px 20px;">
+<div style="text-align:center;margin-bottom:32px;">
+<h1 style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#a855f7,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:0;">Q10 Courses</h1>
+</div>
+<div style="background:#1a1a1a;border-radius:16px;padding:40px;border:1px solid #2a2a2a;">
+<h2 style="font-size:24px;font-weight:700;margin:0 0 8px;">Credenciales Q10</h2>
+<p style="color:#a0a0a0;line-height:1.6;margin:16px 0;">Hola ${name},</p>
+<p style="color:#a0a0a0;line-height:1.6;">Tus credenciales para acceder a los cursos en Q10 son:</p>
+<div style="background:#0a0a0a;border-radius:12px;padding:20px;margin:16px 0;">
+<p style="margin:4px 0;color:#a0a0a0;">👤 <strong style="color:#fafafa;">Usuario Q10:</strong> ${q10User}</p>
+<p style="margin:4px 0;color:#a0a0a0;">🔑 <strong style="color:#fafafa;">Contraseña Q10:</strong> ${q10Pass}</p>
+</div>
+<p style="color:#a0a0a0;margin:16px 0 8px;font-weight:600;">Tus cursos:</p>
+${courseList}
+</div>
+<p style="color:#525252;font-size:12px;text-align:center;margin-top:32px;">© 2026 Q10 Courses</p>
+</div>
+</body>
+</html>`;
+    await this.trySend(email, 'Tus credenciales de Q10 - Q10 Courses', html);
   }
 
   async sendAccessGrantedEmail(email: string, name: string, courseTitle: string, courseLink: string) {
     const html = this.getAccessGrantedTemplate(name, courseTitle, courseLink);
-    await this.sendEmail(email, `Acceso concedido a ${courseTitle}`, html);
+    await this.trySend(email, `Acceso concedido a ${courseTitle}`, html);
   }
 
-  private async sendEmail(to: string, subject: string, html: string) {
+  private async trySend(to: string, subject: string, html: string) {
+    if (!this.provider) {
+      this.logger.log(`[SIMULATED] To: ${to}, Subject: ${subject}`);
+      return;
+    }
     try {
-      const apiKey = this.configService.get('RESEND_API_KEY');
-
-      if (!apiKey || apiKey === 're_...') {
-        this.logger.log(`[EMAIL SIMULATED] To: ${to}, Subject: ${subject}`);
-        return;
-      }
-
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: this.configService.get('EMAIL_FROM') || 'noreply@q10courses.com',
-          to,
-          subject,
-          html,
-        }),
-      });
-
-      if (!res.ok) {
-        this.logger.error(`Error sending email: ${res.statusText}`);
-      }
+      await this.provider.send(to, subject, html);
+      this.logger.log(`Email sent to ${to}: ${subject}`);
     } catch (error) {
-      this.logger.error('Failed to send email', error);
+      this.logger.error(`Failed to send email to ${to}: ${error}`);
     }
   }
 

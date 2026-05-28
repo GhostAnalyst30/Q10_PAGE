@@ -9,6 +9,8 @@ export interface User {
   role: Role;
   isActive?: boolean;
   createdAt: string;
+  q10User?: string | null;
+  q10Pass?: string | null;
 }
 
 export interface Course {

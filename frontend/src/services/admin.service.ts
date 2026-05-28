@@ -72,6 +72,21 @@ export const adminService = {
     return data;
   },
 
+  async sendCredentialsWithPassword(userId: string, password: string, key: string) {
+    const { data } = await api.post(`/admin/send-credentials-password/${userId}`, { password, key });
+    return data;
+  },
+
+  async updateQ10UserCredentials(userId: string, q10User: string, q10Pass: string, key: string) {
+    const { data } = await api.patch(`/admin/users/${userId}/q10-credentials`, { q10User, q10Pass, key });
+    return data;
+  },
+
+  async sendQ10Credentials(userId: string, key: string) {
+    const { data } = await api.post(`/admin/send-q10-credentials/${userId}`, { key });
+    return data;
+  },
+
   async verifyKey(key: string) {
     const { data } = await api.post("/admin/verify-key", { key });
     return data;

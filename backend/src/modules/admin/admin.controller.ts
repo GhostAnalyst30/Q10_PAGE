@@ -127,4 +127,34 @@ export class AdminController {
   ) {
     return this.adminService.updateQ10Link(id, q10Link, key);
   }
+
+  @Patch('users/:id/q10-credentials')
+  @Roles(Role.SUPER_ADMIN)
+  updateQ10UserCredentials(
+    @Param('id') id: string,
+    @Body('q10User') q10User: string,
+    @Body('q10Pass') q10Pass: string,
+    @Body('key') key: string,
+  ) {
+    return this.adminService.updateQ10UserCredentials(id, q10User, q10Pass, key);
+  }
+
+  @Post('send-q10-credentials/:userId')
+  @Roles(Role.SUPER_ADMIN)
+  sendQ10Credentials(
+    @Param('userId') userId: string,
+    @Body('key') key: string,
+  ) {
+    return this.adminService.sendQ10CredentialsEmail(userId, key);
+  }
+
+  @Post('send-credentials-password/:userId')
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  sendCredentialsWithPassword(
+    @Param('userId') userId: string,
+    @Body('password') password: string,
+    @Body('key') key: string,
+  ) {
+    return this.adminService.sendCredentialEmailWithPassword(userId, password, key);
+  }
 }

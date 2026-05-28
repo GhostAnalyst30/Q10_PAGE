@@ -14,6 +14,8 @@ async function main() {
       email: 'admin@q10courses.com',
       password: hashedPassword,
       role: Role.SUPER_ADMIN,
+      q10User: 'admin_q10',
+      q10Pass: 'Q10Admin2026!',
     },
   });
 

@@ -46,7 +46,7 @@ export default function CredentialsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Shield className="h-5 w-5 text-purple-400" />
+              <Shield className="h-5 w-5 text-primary" />
               Credenciales de la Plataforma
             </CardTitle>
           </CardHeader>
@@ -56,7 +56,7 @@ export default function CredentialsPage() {
               <div className="flex items-center gap-2">
                 <code className="px-3 py-2 bg-muted rounded-lg text-sm flex-1">{user.email}</code>
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyToClipboard(user.email)}>
-                  {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+                  {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
@@ -64,7 +64,7 @@ export default function CredentialsPage() {
               <p className="text-xs text-muted-foreground mb-1">Contraseña</p>
               <p className="text-sm text-muted-foreground">
                 Puedes cambiar tu contraseña en{" "}
-                <a href="/dashboard/settings" className="text-purple-400 hover:underline">Configuración</a>
+                <a href="/dashboard/settings" className="text-primary hover:underline">Configuración</a>
               </p>
             </div>
             <div className="pt-2">
@@ -79,7 +79,7 @@ export default function CredentialsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Key className="h-5 w-5 text-yellow-400" />
+              <Key className="h-5 w-5 text-muted-foreground" />
               Credenciales Q10
             </CardTitle>
           </CardHeader>
@@ -91,7 +91,7 @@ export default function CredentialsPage() {
                   <div className="flex items-center gap-2">
                     <code className="px-3 py-2 bg-muted rounded-lg text-sm flex-1">{user.q10User}</code>
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyToClipboard(user.q10User!)}>
-                      {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+                      {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
                 </div>
@@ -105,7 +105,7 @@ export default function CredentialsPage() {
                       {showQ10Pass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyToClipboard(user.q10Pass!)}>
-                      {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+                      {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
                 </div>

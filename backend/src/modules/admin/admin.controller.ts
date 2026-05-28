@@ -14,6 +14,7 @@ import { Role } from '@prisma/client';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -77,15 +78,16 @@ export class AdminController {
   }
 
   @Post('create-admin')
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   createAdmin(
     @Body('name') name: string,
     @Body('email') email: string,
     @Body('password') password: string,
     @Body('role') role: Role,
     @Body('key') key: string,
+    @CurrentUser() user: any,
   ) {
-    return this.adminService.createAdmin(name, email, password, role, key);
+    return this.adminService.createAdmin(name, email, password, role, key, user);
   }
 
   @Post('create-user')

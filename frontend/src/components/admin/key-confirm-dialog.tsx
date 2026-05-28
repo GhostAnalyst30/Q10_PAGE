@@ -49,7 +49,7 @@ export function KeyConfirmDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 mb-4">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary mb-4">
             <Shield className="h-6 w-6 text-white" />
           </div>
           <DialogTitle className="text-center">{title}</DialogTitle>

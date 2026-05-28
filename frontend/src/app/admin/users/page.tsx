@@ -30,25 +30,25 @@ export default function AdminUsersPage() {
 
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
 
-  function loadUsers() {
+  function loadUsers(pageNum: number, searchTerm?: string) {
     setLoading(true);
-    adminService.getUsers({ page, limit: 20, search: search || undefined }).then((res) => {
+    adminService.getUsers({ page: pageNum, limit: 20, search: searchTerm || undefined }).then((res) => {
       setData(res);
       setLoading(false);
     });
   }
 
   useEffect(() => {
-    loadUsers();
+    loadUsers(page, search);
     if (isSuperAdmin) {
       adminService.getUsersComparison().then(setComparison);
     }
-  }, [page]);
+  }, [page, search]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     setPage(1);
-    loadUsers();
+    loadUsers(1, search);
   }
 
   function confirmAction(title: string, desc: string, action: (key: string) => Promise<void>) {
@@ -196,7 +196,7 @@ export default function AdminUsersPage() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <Users className="h-8 w-8 text-purple-400" />
+              <Users className="h-8 w-8 text-primary" />
               <div>
                 <p className="text-xs text-muted-foreground">Total</p>
                 <p className="text-xl font-bold">{comparison.total}</p>
@@ -205,7 +205,7 @@ export default function AdminUsersPage() {
           </Card>
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <UserCheck className="h-8 w-8 text-green-400" />
+              <UserCheck className="h-8 w-8 text-primary" />
               <div>
                 <p className="text-xs text-muted-foreground">Activos</p>
                 <p className="text-xl font-bold">{comparison.active}</p>
@@ -223,7 +223,7 @@ export default function AdminUsersPage() {
           </Card>
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
-              <UserX className="h-8 w-8 text-yellow-400" />
+              <UserX className="h-8 w-8 text-muted-foreground" />
               <div>
                 <p className="text-xs text-muted-foreground">Sin Cursos</p>
                 <p className="text-xl font-bold">{comparison.withoutEnrollments}</p>
@@ -248,13 +248,14 @@ export default function AdminUsersPage() {
           ))}
         </div>
       ) : (
-        <div className="space-y-2">
+        <motion.div className="space-y-2" initial="hidden" animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.03 } } }}>
           {data?.data.map((u) => (
-            <Card key={u.id}>
+            <motion.div key={u.id} variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }} whileHover={{ scale: 1.01, boxShadow: "0 0 20px rgba(0, 87, 255, 0.08)" }}>
+            <Card>
               <CardContent className="p-0">
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-sm font-bold text-white">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
                       {u.name.charAt(0)}
                     </div>
                     <div>
@@ -268,7 +269,7 @@ export default function AdminUsersPage() {
                           {u.isActive ? "Activo" : "Suspendido"}
                         </Badge>
                         {isSuperAdmin && (
-                          <Badge variant="outline" className="text-xs border-yellow-500/30 text-yellow-400">
+                          <Badge variant="outline" className="text-xs border-border text-muted-foreground">
                             Q10: {u.q10User ? "✓" : "✗"}
                           </Badge>
                         )}
@@ -292,7 +293,7 @@ export default function AdminUsersPage() {
                       <div className="p-4 space-y-4">
                         {/* Row 1: Credenciales de la página */}
                         <div>
-                          <h4 className="text-sm font-semibold text-purple-400 mb-2 flex items-center gap-1">
+                          <h4 className="text-sm font-semibold text-primary mb-2 flex items-center gap-1">
                             <Shield className="h-4 w-4" /> Credenciales de la Página
                           </h4>
                           <div className="flex flex-wrap items-center gap-2">
@@ -315,7 +316,7 @@ export default function AdminUsersPage() {
                         {/* Row 2: Credenciales Q10 */}
                         {isSuperAdmin && (
                           <div>
-                            <h4 className="text-sm font-semibold text-yellow-400 mb-2 flex items-center gap-1">
+                            <h4 className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-1">
                               <Key className="h-4 w-4" /> Credenciales Q10
                             </h4>
                             <div className="flex flex-wrap items-center gap-2">
@@ -355,11 +356,11 @@ export default function AdminUsersPage() {
                                 <option value="ADMIN">ADMIN</option>
                               </select>
                               <Button variant="ghost" size="sm" onClick={() => toggleStatus(u.id)} title={u.isActive ? "Suspender" : "Activar"} className="text-xs gap-1">
-                                {u.isActive ? <Ban className="h-3 w-3 text-red-400" /> : <CheckCircle className="h-3 w-3 text-green-400" />}
+                                {u.isActive ? <Ban className="h-3 w-3 text-muted-foreground" /> : <CheckCircle className="h-3 w-3 text-primary" />}
                                 {u.isActive ? "Suspender" : "Activar"}
                               </Button>
                               {isSuperAdmin && (
-                                <Button variant="ghost" size="sm" onClick={() => deleteUser(u.id)} title="Eliminar usuario" className="text-xs gap-1 text-red-400">
+                                <Button variant="ghost" size="sm" onClick={() => deleteUser(u.id)} title="Eliminar usuario" className="text-xs gap-1 text-muted-foreground">
                                   <Trash2 className="h-3 w-3" /> Eliminar
                                 </Button>
                               )}
@@ -372,8 +373,9 @@ export default function AdminUsersPage() {
                 </AnimatePresence>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {data?.meta && data.meta.totalPages > 1 && (

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
 import { BookOpen, ExternalLink, PlayCircle, Lock } from "lucide-react";
 
 export default function MyCoursesPage() {
@@ -22,7 +23,7 @@ export default function MyCoursesPage() {
   }, []);
 
   return (
-    <div>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
       <h2 className="text-2xl font-bold mb-6">Mis Cursos</h2>
 
       {loading ? (
@@ -51,10 +52,11 @@ export default function MyCoursesPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-4" initial="hidden" animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.05 } } }}>
           {enrollments.map((enrollment) => (
-            <Card key={enrollment.id} className="overflow-hidden">
-              <div className="h-40 bg-gradient-to-br from-purple-600/20 to-blue-600/20 flex items-center justify-center">
+            <motion.div key={enrollment.id} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
+            <Card className="overflow-hidden">
+              <div className="h-40 bg-primary/10 flex items-center justify-center">
                 {enrollment.course.thumbnail ? (
                   <img
                     src={enrollment.course.thumbnail}
@@ -112,9 +114,10 @@ export default function MyCoursesPage() {
                 )}
               </CardContent>
             </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -57,15 +57,15 @@ export default function AboutPage() {
     <div>
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-border/40">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent" />
         <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
           <motion.div className="text-center max-w-3xl mx-auto" {...fadeInUp}>
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 mb-6">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 mb-6">
               <BookOpen className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
               Sobre
-              <span className="block bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">
                 Q10 Courses
               </span>
             </h1>
@@ -82,9 +82,10 @@ export default function AboutPage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-8" {...stagger}>
+            <motion.div variants={stagger} whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
             <Card className="p-8 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 mb-4">
-                <Target className="h-7 w-7 text-purple-400" />
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 mb-4">
+                <Target className="h-7 w-7 text-primary" />
               </div>
               <h2 className="text-2xl font-bold mb-4">Nuestra Misión</h2>
               <p className="text-muted-foreground leading-relaxed">
@@ -93,9 +94,11 @@ export default function AboutPage() {
                 estudiantes para los desafíos del mundo real.
               </p>
             </Card>
+            </motion.div>
+            <motion.div variants={stagger} whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
             <Card className="p-8 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 mb-4">
-                <Globe className="h-7 w-7 text-purple-400" />
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 mb-4">
+                <Globe className="h-7 w-7 text-primary" />
               </div>
               <h2 className="text-2xl font-bold mb-4">Nuestra Visión</h2>
               <p className="text-muted-foreground leading-relaxed">
@@ -104,6 +107,7 @@ export default function AboutPage() {
                 carrera de sus estudiantes.
               </p>
             </Card>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -150,13 +154,15 @@ export default function AboutPage() {
                 desc: "Nos enfocamos en resultados reales que transformen la vida profesional de nuestros estudiantes.",
               },
             ].map((v) => (
-              <Card key={v.title} className="p-6 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 mb-4">
-                  <v.icon className="h-6 w-6 text-purple-400" />
+              <motion.div key={v.title} variants={stagger} whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
+              <Card className="p-6 text-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
+                  <v.icon className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{v.title}</h3>
                 <p className="text-sm text-muted-foreground">{v.desc}</p>
               </Card>
+              </motion.div>
             ))}
           </motion.div>
         </div>
@@ -172,22 +178,24 @@ export default function AboutPage() {
             </p>
           </motion.div>
           <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-8" {...stagger}>
-            {team.map((member) => (
-              <Card key={member.name} className="p-6 text-center">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-2xl font-bold text-white mb-4">
+              {team.map((member) => (
+              <motion.div key={member.name} variants={stagger} whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
+              <Card className="p-6 text-center">
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-2xl font-bold text-white mb-4">
                   {member.initials}
                 </div>
                 <h3 className="text-lg font-semibold">{member.name}</h3>
-                <p className="text-sm text-purple-400 mb-2">{member.role}</p>
+                <p className="text-sm text-primary mb-2">{member.role}</p>
                 <p className="text-sm text-muted-foreground">{member.bio}</p>
               </Card>
+              </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-gradient-to-br from-purple-600/10 via-transparent to-blue-600/10 border-t border-border/40">
+      <section className="py-20 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 border-t border-border/40">
         <motion.div
           className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center"
           {...fadeInUp}

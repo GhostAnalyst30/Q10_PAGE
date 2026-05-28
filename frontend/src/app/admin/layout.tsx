@@ -46,7 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-3 mb-8">
-          <Shield className="h-6 w-6 text-purple-400" />
+          <Shield className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">Panel de Administración</h1>
         </div>
 

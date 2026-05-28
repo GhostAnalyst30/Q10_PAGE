@@ -170,8 +170,16 @@ export class AdminService {
     return { total, active, withEnrollments, withoutEnrollments };
   }
 
-  async createAdmin(name: string, email: string, password: string, role: Role = Role.ADMIN, key: string) {
-    this.verifySuperAdminKey(key);
+  async createAdmin(name: string, email: string, password: string, role: Role = Role.ADMIN, key: string, callerUser: any) {
+    if (callerUser.role === 'ADMIN') {
+      if (role !== Role.ADMIN) {
+        throw new ForbiddenException('No tienes permiso para crear superadmins');
+      }
+    } else if (callerUser.role === 'SUPER_ADMIN') {
+      this.verifySuperAdminKey(key);
+    } else {
+      throw new ForbiddenException('No tienes permiso para crear administradores');
+    }
 
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) throw new ConflictException('El email ya está registrado');
@@ -225,6 +233,12 @@ export class AdminService {
 
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
 
     await this.emailService.sendCredentialEmail(user.email, user.name, password);
     return { message: 'Correo de credenciales enviado con contraseña' };

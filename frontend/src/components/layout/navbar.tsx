@@ -41,10 +41,10 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-blue-600">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <BookOpen className="h-4 w-4 text-white" />
             </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="text-lg font-bold bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">
               Q10 Courses
             </span>
           </Link>
@@ -81,7 +81,7 @@ export function Navbar() {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm hover:bg-accent transition-colors"
                 >
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-blue-600 text-xs font-bold text-white">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-white">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                   <span className="max-w-[120px] truncate">{user.name}</span>
@@ -126,7 +126,7 @@ export function Navbar() {
                           <Link
                             href="/admin"
                             onClick={() => setDropdownOpen(false)}
-                            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-purple-400 hover:bg-accent transition-colors"
+                            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-primary hover:bg-accent transition-colors"
                           >
                             <Shield className="h-4 w-4" />
                             Admin Panel
@@ -140,7 +140,7 @@ export function Navbar() {
                           setDropdownOpen(false);
                           logout();
                         }}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-400 hover:bg-accent transition-colors"
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-accent transition-colors"
                       >
                         <LogOut className="h-4 w-4" />
                         Cerrar Sesión
@@ -216,7 +216,7 @@ export function Navbar() {
                   <Link
                     href="/admin"
                     onClick={() => setMobileOpen(false)}
-                    className="rounded-lg px-3 py-2 text-sm text-purple-400"
+                    className="rounded-lg px-3 py-2 text-sm text-primary"
                   >
                     Admin Panel
                   </Link>
@@ -226,7 +226,7 @@ export function Navbar() {
                     setMobileOpen(false);
                     logout();
                   }}
-                  className="rounded-lg px-3 py-2 text-sm text-red-400 text-left"
+                  className="rounded-lg px-3 py-2 text-sm text-muted-foreground text-left"
                 >
                   Cerrar Sesión
                 </button>

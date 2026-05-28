@@ -124,7 +124,7 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-purple-400" />
+                <Shield className="h-5 w-5 text-primary" />
                 Cambiar Email del Superadmin
               </CardTitle>
             </CardHeader>

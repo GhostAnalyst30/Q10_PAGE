@@ -64,12 +64,12 @@ export default function AdminRealtimePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Activity className="h-6 w-6 text-green-400" />
+          <Activity className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-bold">Monitor</h2>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 text-xs text-green-400">
-            <span className="flex h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
             Auto 10s
           </div>
           <Button variant="outline" size="sm" onClick={loadData} disabled={loading} className="gap-1">
@@ -93,7 +93,7 @@ export default function AdminRealtimePage() {
         >
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="border-green-500/20">
+            <Card className="border-border">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -107,8 +107,8 @@ export default function AdminRealtimePage() {
                       {stats.totalUsers}
                     </motion.p>
                   </div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-600/20 to-green-600/10">
-                    <Users className="h-6 w-6 text-green-400" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                    <Users className="h-6 w-6 text-primary" />
                   </div>
                 </div>
               </CardContent>
@@ -120,8 +120,8 @@ export default function AdminRealtimePage() {
                     <p className="text-sm text-muted-foreground">Cursos</p>
                     <p className="text-2xl font-bold mt-1">{stats.totalCourses}</p>
                   </div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600/20 to-purple-600/10">
-                    <BookOpen className="h-6 w-6 text-purple-400" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                    <BookOpen className="h-6 w-6 text-primary" />
                   </div>
                 </div>
               </CardContent>
@@ -146,8 +146,8 @@ export default function AdminRealtimePage() {
                     <p className="text-sm text-muted-foreground">Inscripciones</p>
                     <p className="text-2xl font-bold mt-1">{stats.totalEnrollments}</p>
                   </div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-600/20 to-yellow-600/10">
-                    <ShoppingCart className="h-6 w-6 text-yellow-400" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                    <ShoppingCart className="h-6 w-6 text-muted-foreground" />
                   </div>
                 </div>
               </CardContent>
@@ -160,15 +160,15 @@ export default function AdminRealtimePage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <UserCheck className="h-5 w-5 text-green-400" />
+                    <UserCheck className="h-5 w-5 text-primary" />
                     Registrados vs No Registrados
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-green-500/10">
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5">
                       <div className="flex items-center gap-3">
-                        <UserCheck className="h-5 w-5 text-green-400" />
+                        <UserCheck className="h-5 w-5 text-primary" />
                         <span className="text-sm font-medium">Total Usuarios</span>
                       </div>
                       <span className="text-lg font-bold">{comparison.total}</span>
@@ -180,16 +180,16 @@ export default function AdminRealtimePage() {
                       </div>
                       <span className="text-lg font-bold">{comparison.active}</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-green-500/10">
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5">
                       <div className="flex items-center gap-3">
-                        <BookOpen className="h-5 w-5 text-green-400" />
+                        <BookOpen className="h-5 w-5 text-primary" />
                         <span className="text-sm font-medium">Con Cursos Comprados</span>
                       </div>
                       <span className="text-lg font-bold">{comparison.withEnrollments}</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-yellow-500/10">
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-muted">
                       <div className="flex items-center gap-3">
-                        <UserX className="h-5 w-5 text-yellow-400" />
+                        <UserX className="h-5 w-5 text-muted-foreground" />
                         <span className="text-sm font-medium">Sin Cursos (no registrados en cursos)</span>
                       </div>
                       <span className="text-lg font-bold">{comparison.withoutEnrollments}</span>
@@ -201,7 +201,7 @@ export default function AdminRealtimePage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-purple-400" />
+                    <Activity className="h-5 w-5 text-primary" />
                     Últimos Registros
                   </CardTitle>
                 </CardHeader>
@@ -210,7 +210,7 @@ export default function AdminRealtimePage() {
                     {stats.recentUsers.map((u: any) => (
                       <div key={u.id} className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-xs font-bold text-white">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                             {u.name.charAt(0)}
                           </div>
                           <div>
@@ -233,7 +233,7 @@ export default function AdminRealtimePage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-purple-400" />
+                <BookOpen className="h-5 w-5 text-primary" />
                 Cursos Más Vendidos
               </CardTitle>
             </CardHeader>
@@ -263,7 +263,7 @@ export default function AdminRealtimePage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <ShoppingCart className="h-5 w-5 text-yellow-400" />
+                    <ShoppingCart className="h-5 w-5 text-muted-foreground" />
                     <span className="text-sm font-medium">Artículos en Carritos</span>
                   </div>
                   <span className="text-2xl font-bold">{stats.totalCartItems}</span>

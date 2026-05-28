@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
       <div className="min-h-[80vh] flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardContent className="text-center py-10">
-            <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-4" />
+            <CheckCircle className="h-12 w-12 text-primary mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">Correo Enviado</h2>
             <p className="text-sm text-muted-foreground mb-6">
               Si el email está registrado, recibirás instrucciones para restablecer tu contraseña.
@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 mb-4">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 mb-4">
             <BookOpen className="h-6 w-6 text-white" />
           </div>
           <CardTitle className="text-2xl">Recuperar Contraseña</CardTitle>
@@ -90,7 +90,7 @@ export default function ForgotPasswordPage() {
           <p className="text-center text-sm text-muted-foreground mt-6">
             <Link
               href="/login"
-              className="text-purple-400 hover:text-purple-300"
+              className="text-primary hover:text-blue-300"
             >
               Volver al inicio de sesión
             </Link>

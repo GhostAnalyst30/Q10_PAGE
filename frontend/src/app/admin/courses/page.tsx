@@ -25,23 +25,23 @@ export default function AdminCoursesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [keyDialogOpen, setKeyDialogOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<() => Promise<void>>();
+  const [pendingAction, setPendingAction] = useState<(key: string) => Promise<void>>();
   const [page, setPage] = useState(1);
   const [pricingType, setPricingType] = useState<"USD" | "COP">("USD");
 
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
   const totalPages = data?.meta?.totalPages || 1;
 
-  function loadCourses() {
+  function loadCourses(pageNum?: number) {
     setLoading(true);
-    coursesService.getAll({ page, limit: 20 }).then((res) => {
+    coursesService.getAll({ page: pageNum ?? page, limit: 20 }).then((res) => {
       setData(res);
       setLoading(false);
     });
   }
 
   useEffect(() => {
-    loadCourses();
+    loadCourses(page);
   }, [page]);
 
   async function handleDelete(id: string) {
@@ -186,7 +186,7 @@ export default function AdminCoursesPage() {
                     </select>
                   </div>
                   {pricingType === "COP" && (
-                    <p className="text-xs text-green-400 flex items-center gap-1">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <DollarSign className="h-3 w-3" />
                       Curso configurado con precio de $1 COP para pruebas
                     </p>
@@ -208,7 +208,7 @@ export default function AdminCoursesPage() {
                   <label className="text-sm font-medium">Enlace Q10</label>
                   <input name="q10Link" defaultValue={editingCourse?.q10Link} className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
                   {editingCourse?.q10Link && (
-                    <p className="text-xs text-green-400">Link actual: {editingCourse.q10Link}</p>
+                    <p className="text-xs text-muted-foreground">Link actual: {editingCourse.q10Link}</p>
                   )}
                 </div>
                 <div className="md:col-span-2 flex gap-2">
@@ -226,17 +226,17 @@ export default function AdminCoursesPage() {
           {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
         </div>
       ) : (
-        <div className="space-y-2">
+        <motion.div className="space-y-2" initial="hidden" animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.03 } } }}>
           {data?.data.map((course) => (
             <motion.div
               key={course.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+              whileHover={{ scale: 1.01, boxShadow: "0 0 20px rgba(0, 87, 255, 0.08)" }}
             >
               <Card>
                 <CardContent className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                       <ExternalLink className="h-4 w-4" />
                     </div>
                     <div>
@@ -260,7 +260,7 @@ export default function AdminCoursesPage() {
                     </Button>
                     {isSuperAdmin && (
                       <Button variant="ghost" size="icon" onClick={() => handleDelete(course.id)}>
-                        <Trash2 className="h-4 w-4 text-red-400" />
+                        <Trash2 className="h-4 w-4 text-muted-foreground" />
                       </Button>
                     )}
                   </div>
@@ -268,7 +268,7 @@ export default function AdminCoursesPage() {
               </Card>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {!loading && totalPages > 1 && (
@@ -290,7 +290,7 @@ export default function AdminCoursesPage() {
         onOpenChange={setKeyDialogOpen}
         onConfirm={async (key) => {
           if (pendingAction) {
-            await pendingAction();
+            await pendingAction(key);
           }
         }}
         title="Confirmar cambio en curso"

@@ -25,10 +25,14 @@ export default function AdminAccessPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setKeyDialogOpen(true);
+    if (isSuperAdmin) {
+      setKeyDialogOpen(true);
+    } else {
+      handleCreateAdmin();
+    }
   }
 
-  async function handleCreateAdmin(key: string) {
+  async function handleCreateAdmin(key?: string) {
     setLoading(true);
     try {
       await adminService.createAdmin(name, email, password, role, key);
@@ -52,12 +56,12 @@ export default function AdminAccessPage() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20"
+          className="mb-6 p-4 rounded-xl bg-muted border border-border"
         >
           <div className="flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-yellow-400 mt-0.5" />
+            <AlertTriangle className="h-5 w-5 text-muted-foreground mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-yellow-400">Solo Superadmin</p>
+              <p className="text-sm font-medium text-muted-foreground">Solo Superadmin</p>
               <p className="text-xs text-muted-foreground mt-1">
                 Esta sección permite crear nuevos administradores. Se requiere la clave de seguridad del superadmin.
                 El Superadmin no puede ser eliminado ni degradado por ningún otro usuario.
@@ -70,7 +74,7 @@ export default function AdminAccessPage() {
       <Card className="max-w-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-purple-400" />
+            <Shield className="h-5 w-5 text-primary" />
             Crear Nuevo Administrador
           </CardTitle>
         </CardHeader>
@@ -97,7 +101,7 @@ export default function AdminAccessPage() {
                 className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
               >
                 <option value="ADMIN">ADMIN</option>
-                <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+                {isSuperAdmin && <option value="SUPER_ADMIN">SUPER_ADMIN</option>}
               </select>
             </div>
             <Button type="submit" variant="gradient" className="w-full" disabled={loading}>
@@ -107,13 +111,15 @@ export default function AdminAccessPage() {
         </CardContent>
       </Card>
 
-      <KeyConfirmDialog
-        open={keyDialogOpen}
-        onOpenChange={setKeyDialogOpen}
-        onConfirm={handleCreateAdmin}
-        title="Crear nuevo administrador"
-        description="Ingresa la clave de superadmin para crear este nuevo administrador"
-      />
+      {isSuperAdmin && (
+        <KeyConfirmDialog
+          open={keyDialogOpen}
+          onOpenChange={setKeyDialogOpen}
+          onConfirm={handleCreateAdmin}
+          title="Crear nuevo administrador"
+          description="Ingresa la clave de superadmin para crear este nuevo administrador"
+        />
+      )}
     </motion.div>
   );
 }

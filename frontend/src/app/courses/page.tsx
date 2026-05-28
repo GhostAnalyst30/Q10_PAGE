@@ -11,7 +11,18 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrency } from "@/lib/currency-context";
+import { motion } from "framer-motion";
 import { Search, PlayCircle, X } from "lucide-react";
+
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const CATEGORIES = [
   "Todos",
@@ -90,24 +101,26 @@ function CoursesContent() {
 
       <div className="flex flex-wrap gap-2 mb-8">
         {CATEGORIES.map((cat) => (
-          <button
+          <motion.button
             key={cat}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => {
               setCategory(cat === "Todos" ? "" : cat);
               setPage(1);
             }}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
               (cat === "Todos" && !category) || cat === category
-                ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white"
                 : "bg-muted text-muted-foreground hover:bg-accent"
             }`}
           >
             {cat}
-          </button>
+          </motion.button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" variants={containerVariants} initial="hidden" animate="visible">
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
               <Card key={i} className="overflow-hidden">
@@ -121,13 +134,14 @@ function CoursesContent() {
               </Card>
             ))
           : courses.map((course) => (
-              <Link key={course.id} href={`/courses/${course.slug}`}>
-                <Card className="group overflow-hidden transition-all duration-300 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/5 h-full">
-                  <div className="h-48 bg-gradient-to-br from-purple-600/20 to-blue-600/20 flex items-center justify-center">
+              <motion.div key={course.id} variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+              <Link href={`/courses/${course.slug}`}>
+                <Card className="group overflow-hidden transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5 h-full">
+                  <div className="h-48 bg-primary/10 flex items-center justify-center">
                     {course.thumbnail ? (
                       <img src={course.thumbnail} alt={course.title} className="h-full w-full object-cover" />
                     ) : (
-                      <PlayCircle className="h-12 w-12 text-muted-foreground/40 group-hover:text-purple-400 transition-colors" />
+                      <PlayCircle className="h-12 w-12 text-muted-foreground/40 group-hover:text-primary transition-colors" />
                     )}
                   </div>
                   <CardContent className="p-5">
@@ -136,14 +150,14 @@ function CoursesContent() {
                         <Badge variant="secondary" className="text-xs">{course.category}</Badge>
                       )}
                     </div>
-                    <h3 className="font-semibold text-lg mb-1 group-hover:text-purple-400 transition-colors line-clamp-2">
+                    <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors line-clamp-2">
                       {course.title}
                     </h3>
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                       {course.shortDesc || course.description}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                      <span className="text-lg font-bold bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">
                         {format(course.price)}
                       </span>
                       {course.instructor && (
@@ -153,8 +167,9 @@ function CoursesContent() {
                   </CardContent>
                 </Card>
               </Link>
+              </motion.div>
             ))}
-      </div>
+      </motion.div>
 
       {!loading && courses.length === 0 && (
         <div className="text-center py-20">
@@ -163,19 +178,25 @@ function CoursesContent() {
       )}
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-8">
+        <motion.div className="flex items-center justify-center gap-2 mt-8" initial="hidden" animate="visible" variants={containerVariants}>
+          <motion.div variants={itemVariants}>
           <Button variant="outline" size="sm" onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}>
             Anterior
           </Button>
+          </motion.div>
           {Array.from({ length: totalPages }).map((_, i) => (
+            <motion.div key={i} variants={itemVariants}>
             <Button key={i} variant={page === i + 1 ? "gradient" : "outline"} size="sm" onClick={() => setPage(i + 1)}>
               {i + 1}
             </Button>
+            </motion.div>
           ))}
+          <motion.div variants={itemVariants}>
           <Button variant="outline" size="sm" onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}>
             Siguiente
           </Button>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
     </>
   );

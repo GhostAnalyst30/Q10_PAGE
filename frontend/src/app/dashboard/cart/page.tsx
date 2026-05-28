@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrency } from "@/lib/currency-context";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 import { ShoppingCart, Trash2, ArrowRight, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -67,7 +68,7 @@ export default function CartPage() {
   }
 
   return (
-    <div>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
       <h2 className="text-2xl font-bold mb-6">Carrito de Compras</h2>
 
       {loading ? (
@@ -91,18 +92,19 @@ export default function CartPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          <div className="space-y-3">
+          <motion.div className="space-y-3" initial="hidden" animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.05 } } }}>
             {cart.items.map((item: any) => (
-              <Card key={item.id}>
+              <motion.div key={item.id} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} whileHover={{ scale: 1.01, boxShadow: "0 0 20px rgba(0, 87, 255, 0.08)" }}>
+              <Card>
                 <CardContent className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 text-sm font-bold">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-sm font-bold">
                       {item.course.title.charAt(0)}
                     </div>
                     <div>
                       <Link
                         href={`/courses/${item.course.slug}`}
-                        className="font-medium hover:text-purple-400 transition-colors"
+                        className="font-medium hover:text-primary transition-colors"
                       >
                         {item.course.title}
                       </Link>
@@ -110,7 +112,7 @@ export default function CartPage() {
                         {item.course.instructor && `por ${item.course.instructor}`}
                         {item.course.category && ` · ${item.course.category}`}
                       </p>
-                      <p className="text-sm font-bold text-purple-400 mt-1">
+                      <p className="text-sm font-bold text-primary mt-1">
                         {format(item.course.price)}
                       </p>
                     </div>
@@ -120,20 +122,22 @@ export default function CartPage() {
                     size="icon"
                     onClick={() => handleRemove(item.course.id)}
                   >
-                    <Trash2 className="h-4 w-4 text-red-400" />
+                    <Trash2 className="h-4 w-4 text-muted-foreground" />
                   </Button>
                 </CardContent>
               </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-4">
                 <span className="font-medium">Total ({cart.count} cursos)</span>
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                <motion.span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }}>
                   {format(cart.total)}
-                </span>
+                </motion.span>
               </div>
 
               <div className="flex gap-2 mb-3">
@@ -141,7 +145,7 @@ export default function CartPage() {
                   onClick={() => setGateway("stripe")}
                   className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                     gateway === "stripe"
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                      ? "bg-primary text-white"
                       : "bg-muted text-muted-foreground hover:bg-accent"
                   }`}
                 >
@@ -151,7 +155,7 @@ export default function CartPage() {
                   onClick={() => setGateway("wompi")}
                   className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                     gateway === "wompi"
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                      ? "bg-primary text-white"
                       : "bg-muted text-muted-foreground hover:bg-accent"
                   }`}
                 >
@@ -177,8 +181,9 @@ export default function CartPage() {
               </Button>
             </CardContent>
           </Card>
+          </motion.div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

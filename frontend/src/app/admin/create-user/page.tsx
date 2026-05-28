@@ -45,7 +45,7 @@ export default function AdminCreateUserPage() {
       <Card className="max-w-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5 text-purple-400" />
+            <UserPlus className="h-5 w-5 text-primary" />
             Registrar Usuario en la Plataforma
           </CardTitle>
         </CardHeader>

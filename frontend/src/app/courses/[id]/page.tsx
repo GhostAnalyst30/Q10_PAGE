@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrency } from "@/lib/currency-context";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 import {
   PlayCircle,
   CheckCircle,
@@ -27,6 +28,16 @@ import {
   ShoppingCart,
   ShoppingBag,
 } from "lucide-react";
+
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 export default function CourseDetailPage() {
   const { format } = useCurrency();
@@ -117,7 +128,7 @@ export default function CourseDetailPage() {
   const whatYouLearnList = course.whatYouLearn?.split(",").map((s) => s.trim()) || [];
 
   return (
-    <div className="min-h-screen py-8">
+    <motion.div className="min-h-screen py-8" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Link
           href="/courses"
@@ -127,9 +138,9 @@ export default function CourseDetailPage() {
           Volver a cursos
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <div className="h-64 sm:h-80 rounded-2xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 flex items-center justify-center mb-6 overflow-hidden">
+        <motion.div className="grid grid-cols-1 lg:grid-cols-3 gap-8" variants={containerVariants} initial="hidden" animate="visible">
+          <motion.div className="lg:col-span-2" variants={itemVariants}>
+            <div className="h-64 sm:h-80 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 overflow-hidden">
               {course.thumbnail ? (
                 <img src={course.thumbnail} alt={course.title} className="h-full w-full object-cover" />
               ) : (
@@ -160,22 +171,23 @@ export default function CourseDetailPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
                   {whatYouLearnList.map((item) => (
                     <div key={item} className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-400 mt-0.5 shrink-0" />
+                      <CheckCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                       <span className="text-sm">{item}</span>
                     </div>
                   ))}
                 </div>
               </>
             )}
-          </div>
+          </motion.div>
 
-          <div className="lg:col-span-1">
+          <motion.div className="lg:col-span-1" variants={itemVariants}>
             <div className="sticky top-24">
               <div className="rounded-2xl border border-border bg-card p-6">
-                <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-6">
+                <motion.div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent mb-6" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }}>
                   {format(course.price)}
-                </div>
+                </motion.div>
 
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                 <Button
                   variant="outline"
                   size="lg"
@@ -190,13 +202,14 @@ export default function CourseDetailPage() {
                   )}
                   Agregar al Carrito
                 </Button>
+                </motion.div>
 
                 <div className="flex gap-2 mb-3">
                   <button
                     onClick={() => setGateway("stripe")}
                     className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                       gateway === "stripe"
-                        ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white"
                         : "bg-muted text-muted-foreground hover:bg-accent"
                     }`}
                   >
@@ -206,7 +219,7 @@ export default function CourseDetailPage() {
                     onClick={() => setGateway("wompi")}
                     className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                       gateway === "wompi"
-                        ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white"
                         : "bg-muted text-muted-foreground hover:bg-accent"
                     }`}
                   >
@@ -214,6 +227,7 @@ export default function CourseDetailPage() {
                   </button>
                 </div>
 
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                 <Button
                   variant="gradient"
                   size="lg"
@@ -227,6 +241,7 @@ export default function CourseDetailPage() {
                     <>Comprar Ahora <CreditCard className="ml-2 h-4 w-4" /></>
                   )}
                 </Button>
+                </motion.div>
 
                 <p className="text-xs text-center text-muted-foreground">
                   Pago seguro con {gateway === "stripe" ? "Stripe" : "Wompi"}
@@ -265,9 +280,9 @@ export default function CourseDetailPage() {
                 )}
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

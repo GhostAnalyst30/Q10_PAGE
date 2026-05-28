@@ -13,7 +13,7 @@ export function CurrencyToggle() {
       title={`Mostrar en ${currency === "USD" ? "COP" : "USD"}`}
     >
       <DollarSign className="h-3.5 w-3.5" />
-      <span className={currency === "COP" ? "text-green-400" : "text-blue-400"}>
+      <span className={currency === "COP" ? "text-primary" : "text-blue-400"}>
         {currency}
       </span>
     </button>

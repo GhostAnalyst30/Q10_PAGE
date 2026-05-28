@@ -52,7 +52,7 @@ export default function HomePage() {
     <div>
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-border/40">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent" />
         <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
           <motion.div
             className="text-center max-w-3xl mx-auto"
@@ -76,7 +76,7 @@ export default function HomePage() {
               transition={{ delay: 0.3, duration: 0.6 }}
             >
               Aprende las habilidades
-              <span className="block bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">
                 del futuro
               </span>
             </motion.h1>
@@ -148,7 +148,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/courses"
-              className="hidden sm:flex items-center gap-1 text-sm text-purple-400 hover:text-purple-300 transition-colors"
+              className="hidden sm:flex items-center gap-1 text-sm text-primary hover:text-blue-300 transition-colors"
             >
               Ver todos <ArrowRight className="h-4 w-4" />
             </Link>
@@ -171,10 +171,10 @@ export default function HomePage() {
                   </Card>
                 ))
               : courses.map((course, i) => (
-                  <motion.div key={course.id} variants={stagger}>
+                  <motion.div key={course.id} variants={stagger} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                     <Link href={`/courses/${course.slug}`}>
-                      <Card className="group overflow-hidden transition-all duration-300 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/5 h-full hover:-translate-y-1">
-                        <div className="h-48 bg-gradient-to-br from-purple-600/20 to-blue-600/20 flex items-center justify-center">
+                      <Card className="group overflow-hidden transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5 h-full hover:-translate-y-1">
+                        <div className="h-48 bg-primary/10 flex items-center justify-center">
                           {course.thumbnail ? (
                             <img
                               src={course.thumbnail}
@@ -182,7 +182,7 @@ export default function HomePage() {
                               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
                           ) : (
-                            <PlayCircle className="h-12 w-12 text-muted-foreground/40 group-hover:text-purple-400 transition-colors" />
+                            <PlayCircle className="h-12 w-12 text-muted-foreground/40 group-hover:text-primary transition-colors" />
                           )}
                         </div>
                         <CardContent className="p-5">
@@ -193,14 +193,14 @@ export default function HomePage() {
                               </Badge>
                             )}
                           </div>
-                          <h3 className="font-semibold text-lg mb-1 group-hover:text-purple-400 transition-colors">
+                          <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors">
                             {course.title}
                           </h3>
                           <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                             {course.shortDesc || course.description}
                           </p>
                           <div className="flex items-center justify-between">
-                            <span className="text-lg font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                            <span className="text-lg font-bold bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">
                               {format(course.price)}
                             </span>
                             {course.instructor && (
@@ -261,10 +261,10 @@ export default function HomePage() {
                   "Obtén certificados al completar cada curso y valida tus conocimientos.",
               },
             ].map((benefit) => (
-              <motion.div key={benefit.title} variants={stagger}>
-                <Card className="text-center p-8 hover:border-purple-500/30 transition-all duration-300">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 mb-4">
-                    <benefit.icon className="h-6 w-6 text-purple-400" />
+              <motion.div key={benefit.title} variants={stagger} whileHover={{ scale: 1.02 }}>
+                <Card className="text-center p-8 hover:border-blue-500/30 transition-all duration-300">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
+                    <benefit.icon className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">{benefit.title}</h3>
                   <p className="text-sm text-muted-foreground">
@@ -312,13 +312,13 @@ export default function HomePage() {
                   "La plataforma es muy intuitiva y los instructores explican de manera clara y concisa.",
               },
             ].map((testimonial) => (
-              <motion.div key={testimonial.name} variants={stagger}>
-                <Card className="p-6 h-full hover:border-purple-500/30 transition-all duration-300">
+              <motion.div key={testimonial.name} variants={stagger} whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
+                <Card className="p-6 h-full hover:border-blue-500/30 transition-all duration-300">
                   <div className="flex gap-1 mb-4">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star
                         key={i}
-                        className="h-4 w-4 fill-yellow-500 text-yellow-500"
+                        className="h-4 w-4 fill-blue-500 text-blue-500"
                       />
                     ))}
                   </div>
@@ -326,7 +326,7 @@ export default function HomePage() {
                     &ldquo;{testimonial.content}&rdquo;
                   </p>
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-sm font-bold text-white">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-sm font-bold text-white">
                       {testimonial.name.charAt(0)}
                     </div>
                     <div>
@@ -343,7 +343,7 @@ export default function HomePage() {
 
       {/* CTA */}
       <motion.section
-        className="py-20 bg-gradient-to-br from-purple-600/10 via-transparent to-blue-600/10 border-t border-border/40"
+        className="py-20 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 border-t border-border/40"
         {...fadeInUp}
       >
         <motion.div

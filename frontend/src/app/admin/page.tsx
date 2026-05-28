@@ -41,44 +41,44 @@ export default function AdminStatsPage() {
         </div>
       ) : stats ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" initial="hidden" animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}>
+            <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }} transition={{ type: "spring", stiffness: 200, damping: 15 }} whileHover={{ boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Usuarios</p>
-                      <p className="text-2xl font-bold mt-1">{stats.totalUsers}</p>
+                      <motion.p className="text-2xl font-bold mt-1" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }}>{stats.totalUsers}</motion.p>
                     </div>
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/10">
-                      <Users className="h-6 w-6 text-purple-400" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                      <Users className="h-6 w-6 text-primary" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }} transition={{ type: "spring", stiffness: 200, damping: 15 }} whileHover={{ boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Cursos</p>
-                      <p className="text-2xl font-bold mt-1">{stats.totalCourses}</p>
+                      <motion.p className="text-2xl font-bold mt-1" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }}>{stats.totalCourses}</motion.p>
                     </div>
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-600/20 to-green-600/10">
-                      <BookOpen className="h-6 w-6 text-green-400" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                      <BookOpen className="h-6 w-6 text-primary" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }} transition={{ type: "spring", stiffness: 200, damping: 15 }} whileHover={{ boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Ingresos</p>
-                      <p className="text-2xl font-bold mt-1">{format(stats.totalRevenue)}</p>
+                      <motion.p className="text-2xl font-bold mt-1" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }}>{format(stats.totalRevenue)}</motion.p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600/20 to-blue-600/10">
                       <DollarSign className="h-6 w-6 text-blue-400" />
@@ -87,22 +87,22 @@ export default function AdminStatsPage() {
                 </CardContent>
               </Card>
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+            <motion.div variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }} transition={{ type: "spring", stiffness: 200, damping: 15 }} whileHover={{ boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Inscripciones</p>
-                      <p className="text-2xl font-bold mt-1">{stats.totalEnrollments}</p>
+                      <motion.p className="text-2xl font-bold mt-1" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }}>{stats.totalEnrollments}</motion.p>
                     </div>
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-600/20 to-yellow-600/10">
-                      <ShoppingCart className="h-6 w-6 text-yellow-400" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                      <ShoppingCart className="h-6 w-6 text-muted-foreground" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
@@ -114,7 +114,7 @@ export default function AdminStatsPage() {
                   {stats.recentUsers.map((u: any) => (
                     <div key={u.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-xs font-bold text-white">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                           {u.name.charAt(0)}
                         </div>
                         <div>

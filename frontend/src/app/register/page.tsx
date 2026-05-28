@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 import { BookOpen, Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
@@ -40,9 +41,10 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <Card className="w-full max-w-md">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+        <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 mb-4">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 mb-4">
             <BookOpen className="h-6 w-6 text-white" />
           </div>
           <CardTitle className="text-2xl">Crear Cuenta</CardTitle>
@@ -85,6 +87,7 @@ export default function RegisterPage() {
                 minLength={8}
               />
             </div>
+            <motion.div whileTap={{ scale: 0.97 }}>
             <Button
               type="submit"
               variant="gradient"
@@ -97,18 +100,20 @@ export default function RegisterPage() {
                 "Crear Cuenta"
               )}
             </Button>
+            </motion.div>
           </form>
           <p className="text-center text-sm text-muted-foreground mt-6">
             ¿Ya tienes cuenta?{" "}
             <Link
               href="/login"
-              className="text-purple-400 hover:text-purple-300 font-medium"
+              className="text-primary hover:text-blue-300 font-medium"
             >
               Iniciar Sesión
             </Link>
           </p>
         </CardContent>
       </Card>
+      </motion.div>
     </div>
   );
 }

@@ -46,35 +46,35 @@ export default function AdminDatabasePage() {
       icon: Table,
       count: stats.totalUsers,
       description: "Registros de usuarios en la plataforma",
-      color: "from-purple-600/20 to-blue-600/10",
+      color: "bg-primary/10",
     },
     {
       name: "Cursos",
       icon: Table,
       count: stats.totalCourses,
       description: "Cursos activos disponibles",
-      color: "from-green-600/20 to-green-600/10",
+      color: "bg-primary/10",
     },
     {
       name: "Inscripciones",
       icon: Table,
       count: stats.totalEnrollments,
       description: "Inscripciones aprobadas",
-      color: "from-blue-600/20 to-blue-600/10",
+      color: "bg-primary/10",
     },
     {
       name: "Pagos (Ingresos)",
       icon: HardDrive,
       count: `$${stats.totalRevenue.toLocaleString("es-CO")}`,
       description: "Total de ingresos generados",
-      color: "from-yellow-600/20 to-yellow-600/10",
+      color: "bg-primary/10",
     },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Database className="h-6 w-6 text-purple-400" />
+        <Database className="h-6 w-6 text-primary" />
         <h2 className="text-2xl font-bold">Información de la Base de Datos</h2>
       </div>
 
@@ -83,7 +83,7 @@ export default function AdminDatabasePage() {
           <Card key={table.name}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${table.color}`}>
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${table.color}`}>
                   <table.icon className="h-6 w-6" />
                 </div>
                 <Badge variant="success" className="flex items-center gap-1">
@@ -101,36 +101,36 @@ export default function AdminDatabasePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <HardDrive className="h-5 w-5 text-green-400" />
+            <HardDrive className="h-5 w-5 text-primary" />
             Estado del Sistema
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-xl bg-green-500/10">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5">
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-green-400" />
+                <CheckCircle className="h-5 w-5 text-primary" />
                 <span className="text-sm font-medium">Base de Datos PostgreSQL</span>
               </div>
               <Badge variant="success">Conectada</Badge>
             </div>
-            <div className="flex items-center justify-between p-3 rounded-xl bg-green-500/10">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5">
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-green-400" />
+                <CheckCircle className="h-5 w-5 text-primary" />
                 <span className="text-sm font-medium">Servidor API</span>
               </div>
               <Badge variant="success">Operativo</Badge>
             </div>
-            <div className="flex items-center justify-between p-3 rounded-xl bg-green-500/10">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5">
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-green-400" />
+                <CheckCircle className="h-5 w-5 text-primary" />
                 <span className="text-sm font-medium">Servicio de Correos (Resend)</span>
               </div>
               <Badge variant="success">Activo</Badge>
             </div>
-            <div className="flex items-center justify-between p-3 rounded-xl bg-green-500/10">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5">
               <div className="flex items-center gap-3">
-                <RefreshCw className="h-5 w-5 text-green-400" />
+                <RefreshCw className="h-5 w-5 text-primary" />
                 <span className="text-sm font-medium">Última sincronización</span>
               </div>
               <span className="text-sm font-medium">En tiempo real</span>

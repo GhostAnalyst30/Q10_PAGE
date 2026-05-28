@@ -44,7 +44,7 @@ export default function AdminPaymentsPage() {
             onClick={() => setStatusFilter(status)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
               statusFilter === status
-                ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                ? "bg-primary text-white"
                 : "bg-muted text-muted-foreground hover:bg-accent"
             }`}
           >

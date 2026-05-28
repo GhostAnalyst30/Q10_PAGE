@@ -1,0 +1,284 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Course, PaginatedResponse } from "@/types";
+import { coursesService } from "@/services/courses.service";
+import { adminService } from "@/services/admin.service";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { KeyConfirmDialog } from "@/components/admin/key-confirm-dialog";
+import { formatPrice } from "@/lib/utils";
+import toast from "react-hot-toast";
+import { Plus, Pencil, Trash2, ExternalLink, DollarSign, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+
+const COP_PRICE = 1;
+
+export default function AdminCoursesPage() {
+  const { user } = useAuth();
+  const [data, setData] = useState<PaginatedResponse<Course> | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [keyDialogOpen, setKeyDialogOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<() => Promise<void>>();
+  const [pricingType, setPricingType] = useState<"USD" | "COP">("USD");
+
+  const isSuperAdmin = user?.role === "SUPER_ADMIN";
+
+  function loadCourses() {
+    setLoading(true);
+    coursesService.getAll({ limit: 50 }).then((res) => {
+      setData(res);
+      setLoading(false);
+    });
+  }
+
+  useEffect(() => {
+    loadCourses();
+  }, []);
+
+  async function handleDelete(id: string) {
+    if (!isSuperAdmin) {
+      toast.error("Solo el Superadmin puede eliminar cursos");
+      return;
+    }
+    const doDelete = async (key: string) => {
+      try {
+        await adminService.updateCourse(id, { isActive: false }, key);
+        toast.success("Curso desactivado");
+        loadCourses();
+      } catch (err: any) {
+        toast.error(err.response?.data?.message || "Error");
+        throw err;
+      }
+    };
+    setPendingAction(() => doDelete);
+    setKeyDialogOpen(true);
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    let price = parseFloat(form.get("price") as string);
+    if (pricingType === "COP") {
+      price = COP_PRICE;
+    }
+
+    const courseData = {
+      title: form.get("title") as string,
+      slug: form.get("slug") as string,
+      description: form.get("description") as string,
+      shortDesc: form.get("shortDesc") as string,
+      price,
+      category: form.get("category") as string,
+      instructor: form.get("instructor") as string,
+      whatYouLearn: form.get("whatYouLearn") as string,
+      q10Link: form.get("q10Link") as string,
+    };
+
+    try {
+      if (editingCourse) {
+        const doUpdate = async (key: string) => {
+          try {
+            await adminService.updateCourse(editingCourse.id, courseData, key);
+            toast.success("Curso actualizado");
+            setShowForm(false);
+            setEditingCourse(null);
+            loadCourses();
+          } catch (err: any) {
+            toast.error(err.response?.data?.message || "Error");
+            throw err;
+          }
+        };
+        if (isSuperAdmin) {
+          setPendingAction(() => doUpdate);
+          setKeyDialogOpen(true);
+        } else {
+          await adminService.updateCourse(editingCourse.id, courseData);
+          toast.success("Curso actualizado");
+          setShowForm(false);
+          setEditingCourse(null);
+          loadCourses();
+        }
+      } else {
+        await coursesService.create(courseData);
+        toast.success("Curso creado");
+        setShowForm(false);
+        setEditingCourse(null);
+        loadCourses();
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Error al guardar");
+    }
+  }
+
+  function resetForm() {
+    setShowForm(true);
+    setEditingCourse(null);
+    setPricingType("USD");
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold">Gestión de Cursos</h2>
+        <Button variant="gradient" size="sm" onClick={resetForm}>
+          <Plus className="h-4 w-4 mr-1" /> Nuevo Curso
+        </Button>
+      </div>
+
+      {showForm && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+        >
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {editingCourse ? "Editar Curso" : "Crear Nuevo Curso"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Título</label>
+                  <input name="title" defaultValue={editingCourse?.title} required className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Slug</label>
+                  <input name="slug" defaultValue={editingCourse?.slug} required className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-medium">Descripción</label>
+                  <textarea name="description" defaultValue={editingCourse?.description} required rows={3} className="flex w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Descripción Corta</label>
+                  <input name="shortDesc" defaultValue={editingCourse?.shortDesc} className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Precio</label>
+                  <div className="flex gap-2">
+                    <input
+                      name="price"
+                      type="number"
+                      step="0.01"
+                      defaultValue={editingCourse?.price}
+                      required
+                      disabled={pricingType === "COP"}
+                      className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm disabled:opacity-50"
+                    />
+                    <select
+                      value={pricingType}
+                      onChange={(e) => setPricingType(e.target.value as "USD" | "COP")}
+                      className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
+                    >
+                      <option value="USD">USD</option>
+                      <option value="COP">COP ($1)</option>
+                    </select>
+                  </div>
+                  {pricingType === "COP" && (
+                    <p className="text-xs text-green-400 flex items-center gap-1">
+                      <DollarSign className="h-3 w-3" />
+                      Curso configurado con precio de $1 COP para pruebas
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Categoría</label>
+                  <input name="category" defaultValue={editingCourse?.category} className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Instructor</label>
+                  <input name="instructor" defaultValue={editingCourse?.instructor} className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">¿Qué aprenderá?</label>
+                  <input name="whatYouLearn" defaultValue={editingCourse?.whatYouLearn} className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-medium">Enlace Q10</label>
+                  <input name="q10Link" defaultValue={editingCourse?.q10Link} className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                  {editingCourse?.q10Link && (
+                    <p className="text-xs text-green-400">Link actual: {editingCourse.q10Link}</p>
+                  )}
+                </div>
+                <div className="md:col-span-2 flex gap-2">
+                  <Button type="submit" variant="gradient">{editingCourse ? "Actualizar" : "Crear"} Curso</Button>
+                  <Button type="button" variant="outline" onClick={() => { setShowForm(false); setEditingCourse(null); }}>Cancelar</Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {loading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {data?.data.map((course) => (
+            <motion.div
+              key={course.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <Card>
+                <CardContent className="flex items-center justify-between p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600/20 to-blue-600/20">
+                      <ExternalLink className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{course.title}</p>
+                      <div className="flex gap-2 mt-1">
+                        {course.category && <Badge variant="secondary" className="text-xs">{course.category}</Badge>}
+                        <Badge variant="outline" className="text-xs">
+                          {course.price === COP_PRICE ? "$1 COP" : formatPrice(course.price)}
+                        </Badge>
+                        {course.q10Link && (
+                          <Badge variant="success" className="text-xs flex items-center gap-1">
+                            <ExternalLink className="h-3 w-3" /> Q10
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="icon" onClick={() => { setEditingCourse(course); setShowForm(true); setPricingType("USD"); }}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    {isSuperAdmin && (
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(course.id)}>
+                        <Trash2 className="h-4 w-4 text-red-400" />
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      <KeyConfirmDialog
+        open={keyDialogOpen}
+        onOpenChange={setKeyDialogOpen}
+        onConfirm={async (key) => {
+          if (pendingAction) {
+            await pendingAction();
+          }
+        }}
+        title="Confirmar cambio en curso"
+        description="Ingresa la clave de superadmin para realizar cambios en este curso"
+      />
+    </motion.div>
+  );
+}

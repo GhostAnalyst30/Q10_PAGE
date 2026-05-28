@@ -1,0 +1,51 @@
+node_modules/
+dist/
+.next/
+build/
+
+# Environment files with secrets
+.env
+.env.local
+.env.production
+.env.development
+.env.test
+backend/.env
+frontend/.env.local
+
+# Uploads & databases
+uploads/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE / Editor (avoid accidental credential leaks)
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Dependency lockfiles (ignore workspace root lock, keep per-package)
+pnpm-lock.yaml
+
+# Coverage & reports
+coverage/
+*.lcov
+
+# Certificates (avoid exposing keys)
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+
+# Docker sensitive files
+docker-compose.override.yml

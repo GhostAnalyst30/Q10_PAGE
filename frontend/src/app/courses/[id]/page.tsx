@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Course } from "@/types";
 import { coursesService } from "@/services/courses.service";
+import { cartService } from "@/services/cart.service";
 import { paymentsService } from "@/services/payments.service";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,8 @@ import {
   Loader2,
   ExternalLink,
   CreditCard,
+  ShoppingCart,
+  ShoppingBag,
 } from "lucide-react";
 
 export default function CourseDetailPage() {
@@ -32,6 +35,7 @@ export default function CourseDetailPage() {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
   const [gateway, setGateway] = useState<"stripe" | "wompi">("stripe");
 
   useEffect(() => {
@@ -62,6 +66,22 @@ export default function CourseDetailPage() {
       toast.error(error.response?.data?.message || "Error al procesar el pago");
     } finally {
       setPurchasing(false);
+    }
+  }
+
+  async function handleAddToCart() {
+    if (!user) {
+      toast.error("Debes iniciar sesión para agregar al carrito");
+      return;
+    }
+    setAddingToCart(true);
+    try {
+      await cartService.addToCart(course!.id);
+      toast.success("Curso agregado al carrito");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Error al agregar al carrito");
+    } finally {
+      setAddingToCart(false);
     }
   }
 
@@ -155,6 +175,21 @@ export default function CourseDetailPage() {
                 <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-6">
                   {format(course.price)}
                 </div>
+
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full mb-3 gap-2"
+                  onClick={handleAddToCart}
+                  disabled={addingToCart}
+                >
+                  {addingToCart ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ShoppingCart className="h-4 w-4" />
+                  )}
+                  Agregar al Carrito
+                </Button>
 
                 <div className="flex gap-2 mb-3">
                   <button

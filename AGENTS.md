@@ -37,7 +37,9 @@ npm run dev           # Development on :3000
 - STRIPE_SECRET_KEY - Stripe API key
 - STRIPE_WEBHOOK_SECRET - Stripe webhook secret
 - WOMPI_* - Wompi keys (Colombia)
-- RESEND_API_KEY - Email API key
+- BREVO_API_KEY - Brevo API key (https://app.brevo.com > SMTP & API > API Keys)
+- EMAIL_FROM - Sender email (ej. noreply@tudominio.com)
+- EMAIL_FROM_NAME - Sender name (ej. Q10 Courses)
 - FRONTEND_URL - Frontend URL for CORS
 
 ### Frontend (.env.local)
@@ -49,7 +51,7 @@ npm run dev           # Development on :3000
 - Roles: USER, ADMIN, SUPER_ADMIN
 - Payments: Stripe + Wompi with gateway selection (USD/COP)
 - $1 COP course option for testing
-- Emails via Resend
+- Emails via Brevo
 - Q10 integration per course
 - Admin panel at /admin (with real-time updates every 10s)
 - Superadmin exclusive: Create users, real-time monitor, database dashboard

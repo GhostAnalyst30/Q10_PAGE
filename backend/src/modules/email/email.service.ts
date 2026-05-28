@@ -5,27 +5,33 @@ interface EmailProvider {
   send(to: string, subject: string, html: string): Promise<void>;
 }
 
-class ResendProvider implements EmailProvider {
-  private readonly logger = new Logger('ResendProvider');
+class BrevoProvider implements EmailProvider {
+  private readonly logger = new Logger('BrevoProvider');
 
   constructor(
     private apiKey: string,
-    private from: string,
+    private fromName: string,
+    private fromEmail: string,
   ) {}
 
   async send(to: string, subject: string, html: string): Promise<void> {
-    const res = await fetch('https://api.resend.com/emails', {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
+        'api-key': this.apiKey,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ from: this.from, to, subject, html }),
+      body: JSON.stringify({
+        sender: { name: this.fromName, email: this.fromEmail },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+      }),
     });
     if (!res.ok) {
       const text = await res.text();
-      this.logger.error(`Resend error ${res.status}: ${text}`);
-      throw new Error(`Resend API error: ${res.statusText}`);
+      this.logger.error(`Brevo error ${res.status}: ${text}`);
+      throw new Error(`Brevo API error: ${res.statusText}`);
     }
   }
 }
@@ -40,13 +46,14 @@ export class EmailService {
   }
 
   private initProvider() {
-    const apiKey = this.configService.get('RESEND_API_KEY');
-    if (apiKey && apiKey !== 're_...') {
-      const from = this.configService.get('EMAIL_FROM') || 'noreply@q10courses.com';
-      this.provider = new ResendProvider(apiKey, from);
-      this.logger.log('Email provider: Resend');
+    const apiKey = this.configService.get('BREVO_API_KEY');
+    if (apiKey && !apiKey.startsWith('xkeysib-...')) {
+      const fromName = this.configService.get('EMAIL_FROM_NAME') || 'Q10 Courses';
+      const fromEmail = this.configService.get('EMAIL_FROM') || 'noreply@q10courses.com';
+      this.provider = new BrevoProvider(apiKey, fromName, fromEmail);
+      this.logger.log('Email provider: Brevo');
     } else {
-      this.logger.warn('No valid RESEND_API_KEY — emails will be simulated (check .env)');
+      this.logger.warn('No valid BREVO_API_KEY — emails will be simulated (check .env)');
     }
   }
 

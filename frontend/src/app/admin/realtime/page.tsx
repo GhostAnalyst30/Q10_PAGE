@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useCurrency } from "@/lib/currency-context";
 import { Users, BookOpen, DollarSign, ShoppingCart, Activity, UserCheck, UserX, RefreshCw } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 
@@ -82,18 +82,10 @@ export default function AdminRealtimePage() {
         </div>
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={lastUpdate.getTime()}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="space-y-6"
-        >
+      <div className="space-y-6">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="border-border">
+            <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -271,8 +263,7 @@ export default function AdminRealtimePage() {
               </CardContent>
             </Card>
           )}
-        </motion.div>
-      </AnimatePresence>
+        </div>
     </div>
   );
 }

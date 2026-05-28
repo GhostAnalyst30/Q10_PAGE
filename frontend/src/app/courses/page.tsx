@@ -134,7 +134,7 @@ function CoursesContent() {
               </Card>
             ))
           : courses.map((course) => (
-              <motion.div key={course.id} variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+              <motion.div key={course.id} variants={itemVariants}>
               <Link href={`/courses/${course.slug}`}>
                 <Card className="group overflow-hidden transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5 h-full">
                   <div className="h-48 bg-primary/10 flex items-center justify-center">

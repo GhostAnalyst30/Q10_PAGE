@@ -146,7 +146,6 @@ function ResetPasswordForm() {
                 required
               />
             </div>
-            <motion.div whileTap={{ scale: 0.97 }}>
             <Button
               type="submit"
               variant="gradient"
@@ -159,7 +158,6 @@ function ResetPasswordForm() {
                 "Restablecer Contraseña"
               )}
             </Button>
-            </motion.div>
           </form>
           {error && (
             <p className="text-center text-sm text-muted-foreground mt-4">

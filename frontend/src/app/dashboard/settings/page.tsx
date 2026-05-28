@@ -123,11 +123,9 @@ export default function SettingsPage() {
                   required
                 />
               </div>
-              <motion.div whileTap={{ scale: 0.97 }}>
               <Button type="submit" variant="gradient" disabled={loadingPwd}>
                 {loadingPwd ? <Loader2 className="h-4 w-4 animate-spin" /> : "Actualizar Contraseña"}
               </Button>
-              </motion.div>
             </form>
           </CardContent>
         </Card>
@@ -169,11 +167,9 @@ export default function SettingsPage() {
                     Esta clave está definida en el archivo <code>.env</code> como <code>SUPER_ADMIN_KEY</code>
                   </p>
                 </div>
-                <motion.div whileTap={{ scale: 0.97 }}>
                 <Button type="submit" variant="gradient" disabled={loadingEmail}>
                   {loadingEmail ? <Loader2 className="h-4 w-4 animate-spin" /> : "Actualizar Email"}
                 </Button>
-                </motion.div>
               </form>
             </CardContent>
           </Card>
@@ -194,7 +190,6 @@ export default function SettingsPage() {
                   Alterna entre modo claro y oscuro
                 </p>
               </div>
-              <motion.div whileTap={{ scale: 0.9 }}>
               <Button
                 variant="outline"
                 size="icon"
@@ -206,7 +201,6 @@ export default function SettingsPage() {
                   <Moon className="h-4 w-4" />
                 )}
               </Button>
-              </motion.div>
             </div>
           </CardContent>
         </Card>

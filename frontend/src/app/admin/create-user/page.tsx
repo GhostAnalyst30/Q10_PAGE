@@ -73,11 +73,9 @@ export default function AdminCreateUserPage() {
               <Label htmlFor="password">Contraseña</Label>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
             </div>
-            <motion.div whileTap={{ scale: 0.97 }}>
             <Button type="submit" variant="gradient" className="w-full" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Crear Usuario"}
             </Button>
-            </motion.div>
           </form>
         </CardContent>
       </Card>

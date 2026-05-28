@@ -79,7 +79,6 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <motion.div whileTap={{ scale: 0.97 }}>
             <Button
               type="submit"
               variant="gradient"
@@ -92,7 +91,6 @@ export default function LoginPage() {
                 "Iniciar Sesión"
               )}
             </Button>
-            </motion.div>
           </form>
           <p className="text-center text-sm text-muted-foreground mt-6">
             ¿No tienes cuenta?{" "}

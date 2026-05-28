@@ -50,20 +50,10 @@ export function Navbar() {
             </span>
           </Link>
 
-          <motion.div
-            className="hidden md:flex items-center gap-6"
-            initial={{ opacity: 0, y: -5 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, staggerChildren: 0.05, delayChildren: 0.1 }}
-          >
+          <div className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
-              <motion.div
-                key={link.href}
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
               <Link
+                key={link.href}
                 href={link.href}
                 className={`text-sm transition-colors hover:text-foreground/80 ${
                   isActive(link.href)
@@ -73,9 +63,8 @@ export function Navbar() {
               >
                 {link.label}
               </Link>
-              </motion.div>
             ))}
-          </motion.div>
+          </div>
 
           <div className="hidden md:flex items-center gap-3">
             <CurrencyToggle />
@@ -208,18 +197,10 @@ export function Navbar() {
           className="md:hidden border-t border-border/40 bg-background overflow-hidden"
         >
           <div className="px-4 py-4">
-            <motion.div
-              className="flex flex-col gap-2"
-              initial="hidden"
-              animate="visible"
-              variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.03 } } }}
-            >
+            <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
-                <motion.div
-                  key={link.href}
-                  variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}
-                >
                 <Link
+                  key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
                   className={`rounded-lg px-3 py-2 text-sm block ${
@@ -230,12 +211,10 @@ export function Navbar() {
                 >
                   {link.label}
                 </Link>
-                </motion.div>
               ))}
               <Separator className="my-2" />
               {user ? (
                 <>
-                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
                   <Link
                     href="/dashboard/my-courses"
                     onClick={() => setMobileOpen(false)}
@@ -243,8 +222,6 @@ export function Navbar() {
                   >
                     Dashboard
                   </Link>
-                  </motion.div>
-                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
                   <Link
                     href="/dashboard/profile"
                     onClick={() => setMobileOpen(false)}
@@ -252,9 +229,7 @@ export function Navbar() {
                   >
                     Perfil
                   </Link>
-                  </motion.div>
                   {isAdmin && (
-                    <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
                     <Link
                       href="/admin"
                       onClick={() => setMobileOpen(false)}
@@ -262,9 +237,7 @@ export function Navbar() {
                     >
                       Admin Panel
                     </Link>
-                    </motion.div>
                   )}
-                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
                   <button
                     onClick={() => {
                       setMobileOpen(false);
@@ -274,27 +247,22 @@ export function Navbar() {
                   >
                     Cerrar Sesión
                   </button>
-                  </motion.div>
                 </>
               ) : (
                 <>
-                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
                   <Link href="/login" onClick={() => setMobileOpen(false)}>
                     <Button variant="ghost" size="sm" className="w-full">
                       Iniciar Sesión
                     </Button>
                   </Link>
-                  </motion.div>
-                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
                   <Link href="/register" onClick={() => setMobileOpen(false)}>
                     <Button variant="gradient" size="sm" className="w-full">
                       Registrarse
                     </Button>
                   </Link>
-                  </motion.div>
                 </>
               )}
-            </motion.div>
+            </div>
           </div>
         </motion.div>
       )}

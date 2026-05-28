@@ -171,7 +171,7 @@ export default function HomePage() {
                   </Card>
                 ))
               : courses.map((course, i) => (
-                  <motion.div key={course.id} variants={stagger} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                  <motion.div key={course.id} variants={stagger}>
                     <Link href={`/courses/${course.slug}`}>
                       <Card className="group overflow-hidden transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5 h-full hover:-translate-y-1">
                         <div className="h-48 bg-primary/10 flex items-center justify-center">
@@ -359,17 +359,12 @@ export default function HomePage() {
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
             Únete a nuestra comunidad y accede a cursos de alta calidad diseñados para impulsar tu carrera.
           </p>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Link href="/register">
-              <Button variant="gradient" size="lg">
-                Crear Cuenta Gratis
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </motion.div>
+          <Link href="/register">
+            <Button variant="gradient" size="lg">
+              Crear Cuenta Gratis
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
         </motion.div>
       </motion.section>
     </div>

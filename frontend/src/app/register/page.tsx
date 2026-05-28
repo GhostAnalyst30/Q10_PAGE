@@ -87,7 +87,6 @@ export default function RegisterPage() {
                 minLength={8}
               />
             </div>
-            <motion.div whileTap={{ scale: 0.97 }}>
             <Button
               type="submit"
               variant="gradient"
@@ -100,7 +99,6 @@ export default function RegisterPage() {
                 "Crear Cuenta"
               )}
             </Button>
-            </motion.div>
           </form>
           <p className="text-center text-sm text-muted-foreground mt-6">
             ¿Ya tienes cuenta?{" "}

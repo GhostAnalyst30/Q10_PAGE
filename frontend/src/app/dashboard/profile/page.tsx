@@ -65,11 +65,9 @@ export default function ProfilePage() {
                 required
               />
             </div>
-            <motion.div whileTap={{ scale: 0.97 }}>
             <Button type="submit" variant="gradient">
               Guardar Cambios
             </Button>
-            </motion.div>
           </form>
 
           <Separator className="my-6" />

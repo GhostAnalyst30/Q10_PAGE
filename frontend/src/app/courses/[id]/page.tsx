@@ -187,7 +187,6 @@ export default function CourseDetailPage() {
                   {format(course.price)}
                 </motion.div>
 
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                 <Button
                   variant="outline"
                   size="lg"
@@ -202,7 +201,6 @@ export default function CourseDetailPage() {
                   )}
                   Agregar al Carrito
                 </Button>
-                </motion.div>
 
                 <div className="flex gap-2 mb-3">
                   <button
@@ -227,7 +225,6 @@ export default function CourseDetailPage() {
                   </button>
                 </div>
 
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                 <Button
                   variant="gradient"
                   size="lg"
@@ -241,7 +238,6 @@ export default function CourseDetailPage() {
                     <>Comprar Ahora <CreditCard className="ml-2 h-4 w-4" /></>
                   )}
                 </Button>
-                </motion.div>
 
                 <p className="text-xs text-center text-muted-foreground">
                   Pago seguro con {gateway === "stripe" ? "Stripe" : "Wompi"}

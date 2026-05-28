@@ -1,9 +1,21 @@
 import axios from "axios";
 
+const STORAGE_KEY = "q10_access_token";
 let accessToken: string | null = null;
+
+if (typeof window !== "undefined") {
+  accessToken = localStorage.getItem(STORAGE_KEY);
+}
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
+  if (typeof window !== "undefined") {
+    if (token) {
+      localStorage.setItem(STORAGE_KEY, token);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }
 }
 
 export function getAccessToken() {
@@ -45,9 +57,6 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch {
         setAccessToken(null);
-        if (typeof window !== "undefined") {
-          window.location.href = "/login";
-        }
         return Promise.reject(error);
       }
     }

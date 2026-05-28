@@ -5,21 +5,26 @@ import { Payment, PaginatedResponse } from "@/types";
 import { adminService } from "@/services/admin.service";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function AdminPaymentsPage() {
   const [data, setData] = useState<PaginatedResponse<Payment> | null>(null);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("");
+  const [page, setPage] = useState(1);
+
+  const totalPages = data?.meta?.totalPages || 1;
 
   useEffect(() => {
     setLoading(true);
-    adminService.getPayments({ limit: 50, status: statusFilter || undefined }).then((res) => {
+    adminService.getPayments({ page, limit: 20, status: statusFilter || undefined }).then((res) => {
       setData(res);
       setLoading(false);
     });
-  }, [statusFilter]);
+  }, [statusFilter, page]);
 
   const statusVariant: Record<string, "success" | "warning" | "destructive" | "secondary"> = {
     APPROVED: "success",
@@ -84,6 +89,20 @@ export default function AdminPaymentsPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {!loading && totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-6">
+          <Button variant="outline" size="sm" onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Página {page} de {totalPages}
+          </span>
+          <Button variant="outline" size="sm" onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
       )}
     </div>

@@ -5,7 +5,7 @@ import { adminService } from "@/services/admin.service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { formatPrice } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency-context";
 import { Users, BookOpen, DollarSign, ShoppingCart, Activity, UserCheck, UserX, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 
 export default function AdminRealtimePage() {
   const { user } = useAuth();
+  const { format } = useCurrency();
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
 
   const [stats, setStats] = useState<any>(null);
@@ -23,6 +24,8 @@ export default function AdminRealtimePage() {
   useEffect(() => {
     if (!isSuperAdmin) return;
     loadData();
+    const interval = setInterval(loadData, 10000);
+    return () => clearInterval(interval);
   }, [isSuperAdmin]);
 
   async function loadData() {
@@ -65,6 +68,10 @@ export default function AdminRealtimePage() {
           <h2 className="text-2xl font-bold">Monitor</h2>
         </div>
         <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 text-xs text-green-400">
+            <span className="flex h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+            Auto 10s
+          </div>
           <Button variant="outline" size="sm" onClick={loadData} disabled={loading} className="gap-1">
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Actualizar
@@ -124,7 +131,7 @@ export default function AdminRealtimePage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Ingresos Totales</p>
-                    <p className="text-2xl font-bold mt-1">{formatPrice(stats.totalRevenue)}</p>
+                    <p className="text-2xl font-bold mt-1">{format(stats.totalRevenue)}</p>
                   </div>
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600/20 to-blue-600/10">
                     <DollarSign className="h-6 w-6 text-blue-400" />
@@ -240,7 +247,7 @@ export default function AdminRealtimePage() {
                       </span>
                       <div>
                         <p className="text-sm font-medium">{item.course.title}</p>
-                        <p className="text-xs text-muted-foreground">{formatPrice(item.course.price)}</p>
+                        <p className="text-xs text-muted-foreground">{format(item.course.price)}</p>
                       </div>
                     </div>
                     <span className="text-sm font-medium">{item.enrollments} ventas</span>

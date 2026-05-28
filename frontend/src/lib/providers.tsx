@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
+import { CurrencyProvider } from "@/lib/currency-context";
 import { ReactNode, useState } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -23,17 +24,19 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
         <AuthProvider>
-          {children}
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              style: {
-                background: "#1a1a1a",
-                color: "#fafafa",
-                border: "1px solid #2a2a2a",
-              },
-            }}
-          />
+          <CurrencyProvider>
+            {children}
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                style: {
+                  background: "#1a1a1a",
+                  color: "#fafafa",
+                  border: "1px solid #2a2a2a",
+                },
+              }}
+            />
+          </CurrencyProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

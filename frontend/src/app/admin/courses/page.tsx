@@ -10,28 +10,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { KeyConfirmDialog } from "@/components/admin/key-confirm-dialog";
-import { formatPrice } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency-context";
 import toast from "react-hot-toast";
-import { Plus, Pencil, Trash2, ExternalLink, DollarSign, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, ExternalLink, DollarSign, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 const COP_PRICE = 1;
 
 export default function AdminCoursesPage() {
   const { user } = useAuth();
+  const { format } = useCurrency();
   const [data, setData] = useState<PaginatedResponse<Course> | null>(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [keyDialogOpen, setKeyDialogOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<() => Promise<void>>();
+  const [page, setPage] = useState(1);
   const [pricingType, setPricingType] = useState<"USD" | "COP">("USD");
 
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
+  const totalPages = data?.meta?.totalPages || 1;
 
   function loadCourses() {
     setLoading(true);
-    coursesService.getAll({ limit: 50 }).then((res) => {
+    coursesService.getAll({ page, limit: 20 }).then((res) => {
       setData(res);
       setLoading(false);
     });
@@ -39,7 +42,7 @@ export default function AdminCoursesPage() {
 
   useEffect(() => {
     loadCourses();
-  }, []);
+  }, [page]);
 
   async function handleDelete(id: string) {
     if (!isSuperAdmin) {
@@ -241,7 +244,7 @@ export default function AdminCoursesPage() {
                       <div className="flex gap-2 mt-1">
                         {course.category && <Badge variant="secondary" className="text-xs">{course.category}</Badge>}
                         <Badge variant="outline" className="text-xs">
-                          {course.price === COP_PRICE ? "$1 COP" : formatPrice(course.price)}
+                          {course.price === COP_PRICE ? "$1 COP" : format(course.price)}
                         </Badge>
                         {course.q10Link && (
                           <Badge variant="success" className="text-xs flex items-center gap-1">
@@ -265,6 +268,20 @@ export default function AdminCoursesPage() {
               </Card>
             </motion.div>
           ))}
+        </div>
+      )}
+
+      {!loading && totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-6">
+          <Button variant="outline" size="sm" onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Página {page} de {totalPages}
+          </span>
+          <Button variant="outline" size="sm" onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
       )}
 

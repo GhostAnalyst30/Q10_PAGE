@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatPrice } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency-context";
 import {
   BookOpen,
   GraduationCap,
@@ -37,6 +37,7 @@ const stagger = {
 };
 
 export default function HomePage() {
+  const { format } = useCurrency();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -200,7 +201,7 @@ export default function HomePage() {
                           </p>
                           <div className="flex items-center justify-between">
                             <span className="text-lg font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                              {formatPrice(course.price)}
+                              {format(course.price)}
                             </span>
                             {course.instructor && (
                               <span className="text-xs text-muted-foreground">

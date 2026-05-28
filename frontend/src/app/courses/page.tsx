@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatPrice } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency-context";
 import { Search, PlayCircle, X } from "lucide-react";
 
 const CATEGORIES = [
@@ -23,6 +23,7 @@ const CATEGORIES = [
 ];
 
 function CoursesContent() {
+  const { format } = useCurrency();
   const searchParams = useSearchParams();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -143,7 +144,7 @@ function CoursesContent() {
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                        {formatPrice(course.price)}
+                        {format(course.price)}
                       </span>
                       {course.instructor && (
                         <span className="text-xs text-muted-foreground">por {course.instructor}</span>

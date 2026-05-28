@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatPrice } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency-context";
 import toast from "react-hot-toast";
 import {
   PlayCircle,
@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 
 export default function CourseDetailPage() {
+  const { format } = useCurrency();
   const params = useParams();
   const { user } = useAuth();
   const [course, setCourse] = useState<Course | null>(null);
@@ -152,7 +153,7 @@ export default function CourseDetailPage() {
             <div className="sticky top-24">
               <div className="rounded-2xl border border-border bg-card p-6">
                 <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-6">
-                  {formatPrice(course.price)}
+                  {format(course.price)}
                 </div>
 
                 <div className="flex gap-2 mb-3">

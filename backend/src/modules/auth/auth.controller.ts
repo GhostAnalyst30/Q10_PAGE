@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
@@ -28,7 +29,7 @@ export class AuthController {
   async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.register(dto);
     this.setTokenCookies(res, result.accessToken, result.refreshToken);
-    return { user: result.user };
+    return { user: result.user, accessToken: result.accessToken };
   }
 
   @Post('login')
@@ -36,7 +37,7 @@ export class AuthController {
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.login(dto);
     this.setTokenCookies(res, result.accessToken, result.refreshToken);
-    return { user: result.user };
+    return { user: result.user, accessToken: result.accessToken };
   }
 
   @Post('logout')
@@ -54,11 +55,11 @@ export class AuthController {
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.refresh_token;
     if (!refreshToken) {
-      return { message: 'No hay refresh token' };
+      throw new UnauthorizedException('No hay refresh token');
     }
     const tokens = await this.authService.refreshToken(refreshToken);
     this.setTokenCookies(res, tokens.accessToken, tokens.refreshToken);
-    return { message: 'Token renovado' };
+    return { accessToken: tokens.accessToken, message: 'Token renovado' };
   }
 
   @Post('forgot-password')

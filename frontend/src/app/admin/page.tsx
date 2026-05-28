@@ -6,12 +6,13 @@ import { adminService } from "@/services/admin.service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { formatPrice } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency-context";
 import { Users, BookOpen, DollarSign, ShoppingCart, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 export default function AdminStatsPage() {
+  const { format } = useCurrency();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -77,7 +78,7 @@ export default function AdminStatsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Ingresos</p>
-                      <p className="text-2xl font-bold mt-1">{formatPrice(stats.totalRevenue)}</p>
+                      <p className="text-2xl font-bold mt-1">{format(stats.totalRevenue)}</p>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600/20 to-blue-600/10">
                       <DollarSign className="h-6 w-6 text-blue-400" />
@@ -142,7 +143,7 @@ export default function AdminStatsPage() {
                         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-sm font-bold">{i + 1}</span>
                         <div>
                           <p className="text-sm font-medium">{item.course.title}</p>
-                          <p className="text-xs text-muted-foreground">{formatPrice(item.course.price)}</p>
+                          <p className="text-xs text-muted-foreground">{format(item.course.price)}</p>
                         </div>
                       </div>
                       <span className="text-sm font-medium">{item.enrollments} ventas</span>

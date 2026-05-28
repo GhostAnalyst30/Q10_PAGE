@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { CurrencyToggle } from "@/components/currency-toggle";
 import {
   BookOpen,
   Menu,
@@ -65,6 +66,7 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <CurrencyToggle />
             {user && (
               <Link
                 href="/dashboard/cart"

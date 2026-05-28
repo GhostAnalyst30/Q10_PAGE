@@ -189,29 +189,6 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Info de la clave SUPER_ADMIN_KEY */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Información de Seguridad</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <p className="text-muted-foreground">
-              <span className="font-medium text-foreground">SUPER_ADMIN_KEY:</span> Esta clave se configura en el archivo <code className="bg-muted px-1 rounded">backend/.env</code>
-            </p>
-            <p className="text-muted-foreground">
-              <span className="font-medium text-foreground">Valor por defecto:</span> <code className="bg-muted px-1 rounded">SuperAdmin2026!CambiaEsto</code>
-            </p>
-            <p className="text-muted-foreground">
-              Para cambiarla, edita el archivo <code className="bg-muted px-1 rounded">.env</code> del backend o la variable de entorno en tu servicio de hosting (Railway/Render).
-            </p>
-            <div className="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 mt-2">
-              <p className="text-yellow-400 text-xs">
-                ⚠️ En producción, cambia este valor por una clave segura y única. Sin ella, nadie puede realizar cambios críticos en la plataforma.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

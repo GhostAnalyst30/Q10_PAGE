@@ -1,26 +1,29 @@
-import api from "@/lib/api";
+import api, { setAccessToken } from "@/lib/api";
 import { User } from "@/types";
 
 export const authService = {
   async login(email: string, password: string) {
-    const { data } = await api.post<{ user: User }>("/auth/login", {
+    const { data } = await api.post<{ user: User; accessToken: string }>("/auth/login", {
       email,
       password,
     });
+    setAccessToken(data.accessToken);
     return data;
   },
 
   async register(name: string, email: string, password: string) {
-    const { data } = await api.post<{ user: User }>("/auth/register", {
+    const { data } = await api.post<{ user: User; accessToken: string }>("/auth/register", {
       name,
       email,
       password,
     });
+    setAccessToken(data.accessToken);
     return data;
   },
 
   async logout() {
-    await api.post("/auth/logout");
+    try { await api.post("/auth/logout"); } catch {}
+    setAccessToken(null);
   },
 
   async getProfile() {

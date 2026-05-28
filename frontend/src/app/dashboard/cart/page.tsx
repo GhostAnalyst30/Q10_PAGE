@@ -7,14 +7,18 @@ import { paymentsService } from "@/services/payments.service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatPrice } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency-context";
 import toast from "react-hot-toast";
 import { ShoppingCart, Trash2, ArrowRight, Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function CartPage() {
+  const { format } = useCurrency();
+  const { user } = useAuth();
   const [cart, setCart] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
+  const [gateway, setGateway] = useState<"stripe" | "wompi">("stripe");
 
   function loadCart() {
     setLoading(true);
@@ -39,11 +43,22 @@ export default function CartPage() {
   }
 
   async function handleCheckout() {
+    if (!user) {
+      toast.error("Debes iniciar sesión para comprar");
+      return;
+    }
     if (!cart?.items?.length) return;
     setPurchasing(true);
     try {
-      const { url } = await paymentsService.createStripePayment(cart.items[0].course.id);
-      window.location.href = url;
+      if (gateway === "wompi") {
+        const data = await paymentsService.createWompiPayment(cart.items[0].course.id);
+        toast.success("Redirigiendo a Wompi...");
+        const wompiUrl = `https://checkout.wompi.co/p/?public-key=${data.publicKey}&amount=${data.amount}&currency=COP&reference=${data.reference}&signature:integrity=${data.signature}&redirect-url=${data.redirectUrl}`;
+        window.location.href = wompiUrl;
+      } else {
+        const { url } = await paymentsService.createStripePayment(cart.items[0].course.id);
+        window.location.href = url;
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Error al procesar el pago");
     } finally {
@@ -96,7 +111,7 @@ export default function CartPage() {
                         {item.course.category && ` · ${item.course.category}`}
                       </p>
                       <p className="text-sm font-bold text-purple-400 mt-1">
-                        {formatPrice(item.course.price)}
+                        {format(item.course.price)}
                       </p>
                     </div>
                   </div>
@@ -117,9 +132,33 @@ export default function CartPage() {
               <div className="flex items-center justify-between mb-4">
                 <span className="font-medium">Total ({cart.count} cursos)</span>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                  {formatPrice(cart.total)}
+                  {format(cart.total)}
                 </span>
               </div>
+
+              <div className="flex gap-2 mb-3">
+                <button
+                  onClick={() => setGateway("stripe")}
+                  className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                    gateway === "stripe"
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                      : "bg-muted text-muted-foreground hover:bg-accent"
+                  }`}
+                >
+                  Stripe (USD)
+                </button>
+                <button
+                  onClick={() => setGateway("wompi")}
+                  className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                    gateway === "wompi"
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                      : "bg-muted text-muted-foreground hover:bg-accent"
+                  }`}
+                >
+                  Wompi (COP)
+                </button>
+              </div>
+
               <Button
                 variant="gradient"
                 size="lg"

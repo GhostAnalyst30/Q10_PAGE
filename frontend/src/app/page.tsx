@@ -29,9 +29,14 @@ const fadeInUp = {
   transition: { duration: 0.6 },
 };
 
-const stagger = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
+const staggerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const staggerGrid = {
+  initial: "hidden",
+  whileInView: "visible",
   viewport: { once: true },
   transition: { staggerChildren: 0.1, delayChildren: 0.2 },
 };
@@ -52,7 +57,7 @@ export default function HomePage() {
     <div>
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-border/40">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent pointer-events-none" />
         <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
           <motion.div
             className="text-center max-w-3xl mx-auto"
@@ -156,7 +161,8 @@ export default function HomePage() {
 
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            variants={stagger}
+            variants={staggerVariants}
+            {...staggerGrid}
           >
             {loading
               ? Array.from({ length: 3 }).map((_, i) => (
@@ -171,7 +177,7 @@ export default function HomePage() {
                   </Card>
                 ))
               : courses.map((course, i) => (
-                  <motion.div key={course.id} variants={stagger}>
+                  <motion.div key={course.id} variants={staggerVariants}>
                     <Link href={`/courses/${course.slug}`}>
                       <Card className="group overflow-hidden transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5 h-full hover:-translate-y-1">
                         <div className="h-48 bg-primary/10 flex items-center justify-center">
@@ -240,7 +246,7 @@ export default function HomePage() {
               Todo lo que necesitas para impulsar tu carrera
             </p>
           </motion.div>
-          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-8" variants={stagger}>
+          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-8" variants={staggerVariants} {...staggerGrid}>
             {[
               {
                 icon: GraduationCap,
@@ -261,7 +267,7 @@ export default function HomePage() {
                   "Obtén certificados al completar cada curso y valida tus conocimientos.",
               },
             ].map((benefit) => (
-              <motion.div key={benefit.title} variants={stagger} whileHover={{ scale: 1.02 }}>
+              <motion.div key={benefit.title} variants={staggerVariants} whileHover={{ scale: 1.02 }}>
                 <Card className="text-center p-8 hover:border-blue-500/30 transition-all duration-300">
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
                     <benefit.icon className="h-6 w-6 text-primary" />
@@ -291,7 +297,7 @@ export default function HomePage() {
               Miles de estudiantes ya confían en nosotros
             </p>
           </motion.div>
-          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6" variants={stagger}>
+          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6" variants={staggerVariants} {...staggerGrid}>
             {[
               {
                 name: "María García",
@@ -312,7 +318,7 @@ export default function HomePage() {
                   "La plataforma es muy intuitiva y los instructores explican de manera clara y concisa.",
               },
             ].map((testimonial) => (
-              <motion.div key={testimonial.name} variants={stagger} whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
+              <motion.div key={testimonial.name} variants={staggerVariants} whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(0, 87, 255, 0.15)" }}>
                 <Card className="p-6 h-full hover:border-blue-500/30 transition-all duration-300">
                   <div className="flex gap-1 mb-4">
                     {Array.from({ length: 5 }).map((_, i) => (

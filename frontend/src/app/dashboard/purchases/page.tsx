@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { CreditCard } from "lucide-react";
 
 export default function PurchasesPage() {
@@ -28,7 +29,11 @@ export default function PurchasesPage() {
   };
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <h2 className="text-2xl font-bold mb-6">Historial de Compras</h2>
 
       {loading ? (
@@ -38,16 +43,32 @@ export default function PurchasesPage() {
           ))}
         </div>
       ) : payments.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <CreditCard className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground">No hay compras registradas</p>
           </CardContent>
         </Card>
+        </motion.div>
       ) : (
-        <div className="space-y-3">
+        <motion.div
+          className="space-y-3"
+          initial="hidden"
+          animate="visible"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.05 } } }}
+        >
           {payments.map((payment) => (
-            <Card key={payment.id}>
+            <motion.div
+              key={payment.id}
+              variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}
+              whileHover={{ scale: 1.01, boxShadow: "0 0 20px rgba(0, 87, 255, 0.08)" }}
+            >
+            <Card>
               <CardContent className="flex items-center justify-between p-5">
                 <div>
                   <p className="font-semibold">
@@ -77,9 +98,10 @@ export default function PurchasesPage() {
                 </Badge>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }

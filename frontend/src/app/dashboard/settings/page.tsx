@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { authService } from "@/services/auth.service";
 import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 import { Sun, Moon, Loader2, Shield } from "lucide-react";
 
 export default function SettingsPage() {
@@ -67,11 +68,21 @@ export default function SettingsPage() {
   }
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <h2 className="text-2xl font-bold mb-6">Configuración</h2>
 
-      <div className="space-y-6">
+      <motion.div
+        className="space-y-6"
+        initial="hidden"
+        animate="visible"
+        variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+      >
         {/* Change Password */}
+        <motion.div variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}>
         <Card>
           <CardHeader>
             <CardTitle>Cambiar Contraseña</CardTitle>
@@ -112,15 +123,19 @@ export default function SettingsPage() {
                   required
                 />
               </div>
+              <motion.div whileTap={{ scale: 0.97 }}>
               <Button type="submit" variant="gradient" disabled={loadingPwd}>
                 {loadingPwd ? <Loader2 className="h-4 w-4 animate-spin" /> : "Actualizar Contraseña"}
               </Button>
+              </motion.div>
             </form>
           </CardContent>
         </Card>
+        </motion.div>
 
         {/* Change Email (solo superadmin) */}
         {isSuperAdmin && (
+          <motion.div variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -154,15 +169,19 @@ export default function SettingsPage() {
                     Esta clave está definida en el archivo <code>.env</code> como <code>SUPER_ADMIN_KEY</code>
                   </p>
                 </div>
+                <motion.div whileTap={{ scale: 0.97 }}>
                 <Button type="submit" variant="gradient" disabled={loadingEmail}>
                   {loadingEmail ? <Loader2 className="h-4 w-4 animate-spin" /> : "Actualizar Email"}
                 </Button>
+                </motion.div>
               </form>
             </CardContent>
           </Card>
+          </motion.div>
         )}
 
         {/* Theme */}
+        <motion.div variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}>
         <Card>
           <CardHeader>
             <CardTitle>Apariencia</CardTitle>
@@ -175,6 +194,7 @@ export default function SettingsPage() {
                   Alterna entre modo claro y oscuro
                 </p>
               </div>
+              <motion.div whileTap={{ scale: 0.9 }}>
               <Button
                 variant="outline"
                 size="icon"
@@ -186,10 +206,12 @@ export default function SettingsPage() {
                   <Moon className="h-4 w-4" />
                 )}
               </Button>
+              </motion.div>
             </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 }

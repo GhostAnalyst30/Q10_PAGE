@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
+import { motion } from "framer-motion";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -27,9 +28,18 @@ export default function ProfilePage() {
   }
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <h2 className="text-2xl font-bold mb-6">Mi Perfil</h2>
 
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.3 }}
+      >
       <Card>
         <CardHeader>
           <CardTitle>Información Personal</CardTitle>
@@ -55,9 +65,11 @@ export default function ProfilePage() {
                 required
               />
             </div>
+            <motion.div whileTap={{ scale: 0.97 }}>
             <Button type="submit" variant="gradient">
               Guardar Cambios
             </Button>
+            </motion.div>
           </form>
 
           <Separator className="my-6" />
@@ -80,6 +92,7 @@ export default function ProfilePage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

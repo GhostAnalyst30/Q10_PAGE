@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { authService } from "@/services/auth.service";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 import { BookOpen, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
 function ResetPasswordForm() {
@@ -57,7 +58,12 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <motion.div
+        className="min-h-[80vh] flex items-center justify-center px-4"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         <Card className="w-full max-w-md">
           <CardContent className="text-center py-10">
             <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -70,13 +76,18 @@ function ResetPasswordForm() {
             </Link>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     );
   }
 
   if (success) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <motion.div
+        className="min-h-[80vh] flex items-center justify-center px-4"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         <Card className="w-full max-w-md">
           <CardContent className="text-center py-10">
             <CheckCircle className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -89,12 +100,17 @@ function ResetPasswordForm() {
             </Link>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     );
   }
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
@@ -130,6 +146,7 @@ function ResetPasswordForm() {
                 required
               />
             </div>
+            <motion.div whileTap={{ scale: 0.97 }}>
             <Button
               type="submit"
               variant="gradient"
@@ -142,6 +159,7 @@ function ResetPasswordForm() {
                 "Restablecer Contraseña"
               )}
             </Button>
+            </motion.div>
           </form>
           {error && (
             <p className="text-center text-sm text-muted-foreground mt-4">
@@ -158,6 +176,7 @@ function ResetPasswordForm() {
           </p>
         </CardContent>
       </Card>
+      </motion.div>
     </div>
   );
 }

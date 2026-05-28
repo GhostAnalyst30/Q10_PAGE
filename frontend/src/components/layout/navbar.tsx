@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CurrencyToggle } from "@/components/currency-toggle";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
   Menu,
@@ -49,10 +50,20 @@ export function Navbar() {
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-6">
+          <motion.div
+            className="hidden md:flex items-center gap-6"
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, staggerChildren: 0.05, delayChildren: 0.1 }}
+          >
             {navLinks.map((link) => (
-              <Link
+              <motion.div
                 key={link.href}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+              <Link
                 href={link.href}
                 className={`text-sm transition-colors hover:text-foreground/80 ${
                   isActive(link.href)
@@ -62,8 +73,9 @@ export function Navbar() {
               >
                 {link.label}
               </Link>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <div className="hidden md:flex items-center gap-3">
             <CurrencyToggle />
@@ -88,13 +100,20 @@ export function Navbar() {
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </button>
 
+                <AnimatePresence>
                 {dropdownOpen && (
                   <>
                     <div
                       className="fixed inset-0 z-10"
                       onClick={() => setDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 top-full mt-2 z-20 w-56 rounded-xl border border-border bg-card p-1 shadow-lg">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: -5 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -5 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 z-20 w-56 rounded-xl border border-border bg-card p-1 shadow-lg"
+                    >
                       <Link
                         href="/dashboard/my-courses"
                         onClick={() => setDropdownOpen(false)}
@@ -145,9 +164,10 @@ export function Navbar() {
                         <LogOut className="h-4 w-4" />
                         Cerrar Sesión
                       </button>
-                    </div>
+                    </motion.div>
                   </>
                 )}
+                </AnimatePresence>
               </div>
             ) : (
               <>
@@ -178,76 +198,107 @@ export function Navbar() {
         </div>
       </div>
 
+      <AnimatePresence>
       {mobileOpen && (
-        <div className="md:hidden border-t border-border/40 bg-background px-4 py-4">
-          <div className="flex flex-col gap-2">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={`rounded-lg px-3 py-2 text-sm ${
-                  isActive(link.href)
-                    ? "bg-accent font-medium"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <Separator className="my-2" />
-            {user ? (
-              <>
-                <Link
-                  href="/dashboard/my-courses"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm"
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.2 }}
+          className="md:hidden border-t border-border/40 bg-background overflow-hidden"
+        >
+          <div className="px-4 py-4">
+            <motion.div
+              className="flex flex-col gap-2"
+              initial="hidden"
+              animate="visible"
+              variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.03 } } }}
+            >
+              {navLinks.map((link) => (
+                <motion.div
+                  key={link.href}
+                  variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}
                 >
-                  Dashboard
-                </Link>
                 <Link
-                  href="/dashboard/profile"
+                  href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm"
+                  className={`rounded-lg px-3 py-2 text-sm block ${
+                    isActive(link.href)
+                      ? "bg-accent font-medium"
+                      : "text-muted-foreground"
+                  }`}
                 >
-                  Perfil
+                  {link.label}
                 </Link>
-                {isAdmin && (
+                </motion.div>
+              ))}
+              <Separator className="my-2" />
+              {user ? (
+                <>
+                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
                   <Link
-                    href="/admin"
+                    href="/dashboard/my-courses"
                     onClick={() => setMobileOpen(false)}
-                    className="rounded-lg px-3 py-2 text-sm text-primary"
+                    className="rounded-lg px-3 py-2 text-sm block"
                   >
-                    Admin Panel
+                    Dashboard
                   </Link>
-                )}
-                <button
-                  onClick={() => {
-                    setMobileOpen(false);
-                    logout();
-                  }}
-                  className="rounded-lg px-3 py-2 text-sm text-muted-foreground text-left"
-                >
-                  Cerrar Sesión
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/login" onClick={() => setMobileOpen(false)}>
-                  <Button variant="ghost" size="sm" className="w-full">
-                    Iniciar Sesión
-                  </Button>
-                </Link>
-                <Link href="/register" onClick={() => setMobileOpen(false)}>
-                  <Button variant="gradient" size="sm" className="w-full">
-                    Registrarse
-                  </Button>
-                </Link>
-              </>
-            )}
+                  </motion.div>
+                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
+                  <Link
+                    href="/dashboard/profile"
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-lg px-3 py-2 text-sm block"
+                  >
+                    Perfil
+                  </Link>
+                  </motion.div>
+                  {isAdmin && (
+                    <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
+                    <Link
+                      href="/admin"
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2 text-sm text-primary block"
+                    >
+                      Admin Panel
+                    </Link>
+                    </motion.div>
+                  )}
+                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false);
+                      logout();
+                    }}
+                    className="rounded-lg px-3 py-2 text-sm text-muted-foreground text-left w-full"
+                  >
+                    Cerrar Sesión
+                  </button>
+                  </motion.div>
+                </>
+              ) : (
+                <>
+                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
+                  <Link href="/login" onClick={() => setMobileOpen(false)}>
+                    <Button variant="ghost" size="sm" className="w-full">
+                      Iniciar Sesión
+                    </Button>
+                  </Link>
+                  </motion.div>
+                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}>
+                  <Link href="/register" onClick={() => setMobileOpen(false)}>
+                    <Button variant="gradient" size="sm" className="w-full">
+                      Registrarse
+                    </Button>
+                  </Link>
+                  </motion.div>
+                </>
+              )}
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </nav>
   );
 }

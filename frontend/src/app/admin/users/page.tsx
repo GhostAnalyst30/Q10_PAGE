@@ -30,7 +30,7 @@ export default function AdminUsersPage() {
 
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
 
-  function loadUsers(pageNum: number, searchTerm?: string) {
+  function loadUsers(pageNum?: number, searchTerm?: string) {
     setLoading(true);
     adminService.getUsers({ page: pageNum, limit: 20, search: searchTerm || undefined }).then((res) => {
       setData(res);

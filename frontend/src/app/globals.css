@@ -78,6 +78,18 @@ html {
   .animate-scale-in {
     animation: scaleIn 0.3s ease-out;
   }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
 }
 
 @keyframes fadeIn {
@@ -110,6 +122,21 @@ html {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 rgba(0, 87, 255, 0); }
+  50% { box-shadow: 0 0 20px rgba(0, 87, 255, 0.15); }
 }
 
 /* Scrollbar styling */

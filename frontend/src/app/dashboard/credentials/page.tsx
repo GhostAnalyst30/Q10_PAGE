@@ -38,11 +38,17 @@ export default function CredentialsPage() {
   const approvedEnrollments = enrollments.filter(e => e.paymentStatus === "APPROVED" && e.accessGranted);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
       <h2 className="text-2xl font-bold mb-6">Mis Credenciales</h2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <motion.div
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        initial="hidden"
+        animate="visible"
+        variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+      >
         {/* Credenciales de la Página */}
+        <motion.div variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }} whileHover={{ boxShadow: "0 0 20px rgba(0, 87, 255, 0.08)" }}>
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -75,7 +81,10 @@ export default function CredentialsPage() {
           </CardContent>
         </Card>
 
+        </motion.div>
+
         {/* Credenciales Q10 */}
+        <motion.div variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }} whileHover={{ boxShadow: "0 0 20px rgba(0, 87, 255, 0.08)" }}>
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -123,10 +132,16 @@ export default function CredentialsPage() {
             )}
           </CardContent>
         </Card>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Cursos con acceso Q10 */}
       {approvedEnrollments.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.3 }}
+        >
         <Card className="mt-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
@@ -135,9 +150,18 @@ export default function CredentialsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <motion.div
+              className="space-y-3"
+              initial="hidden"
+              animate="visible"
+              variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.05 } } }}
+            >
               {approvedEnrollments.map((enrollment) => (
-                <div key={enrollment.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                <motion.div
+                  key={enrollment.id}
+                  variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}
+                  whileHover={{ scale: 1.01, boxShadow: "0 0 20px rgba(0, 87, 255, 0.08)" }}
+                  className="flex items-center justify-between p-3 bg-muted/30 rounded-lg transition-all duration-200">
                   <div>
                     <p className="font-medium text-sm">{enrollment.course.title}</p>
                     <p className="text-xs text-muted-foreground">{enrollment.course.category}</p>
@@ -151,11 +175,12 @@ export default function CredentialsPage() {
                   ) : (
                     <Badge variant="outline" className="text-xs">Sin enlace</Badge>
                   )}
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </CardContent>
         </Card>
+        </motion.div>
       )}
 
       {loading && (

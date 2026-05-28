@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { KeyConfirmDialog } from "@/components/admin/key-confirm-dialog";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 import { UserPlus, Loader2 } from "lucide-react";
 
 export default function AdminCreateUserPage() {
@@ -39,9 +40,18 @@ export default function AdminCreateUserPage() {
   }
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <h2 className="text-2xl font-bold mb-6">Crear Nuevo Usuario</h2>
 
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.3 }}
+      >
       <Card className="max-w-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -63,12 +73,15 @@ export default function AdminCreateUserPage() {
               <Label htmlFor="password">Contraseña</Label>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
             </div>
+            <motion.div whileTap={{ scale: 0.97 }}>
             <Button type="submit" variant="gradient" className="w-full" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Crear Usuario"}
             </Button>
+            </motion.div>
           </form>
         </CardContent>
       </Card>
+      </motion.div>
 
       <KeyConfirmDialog
         open={keyDialogOpen}
@@ -77,6 +90,6 @@ export default function AdminCreateUserPage() {
         title="Crear nuevo usuario"
         description="Ingresa la clave de superadmin para crear este usuario"
       />
-    </div>
+    </motion.div>
   );
 }

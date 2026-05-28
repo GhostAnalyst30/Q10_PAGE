@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   BookOpen,
@@ -41,7 +42,12 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen p-8">
+      <motion.div
+        className="min-h-screen p-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         <Skeleton className="h-8 w-48 mb-8" />
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="space-y-2">
@@ -53,16 +59,26 @@ export default function DashboardLayout({
             <Skeleton className="h-64 w-full" />
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   if (!user) return null;
 
   return (
-    <div className="min-h-screen">
+    <motion.div
+      className="min-h-screen"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center gap-3 mb-8">
+        <motion.div
+          className="flex items-center gap-3 mb-8"
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1, duration: 0.3 }}
+        >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-sm font-bold text-white">
             {user.name.charAt(0).toUpperCase()}
           </div>
@@ -70,21 +86,37 @@ export default function DashboardLayout({
             <h1 className="text-xl font-bold">Dashboard</h1>
             <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-1">
-            <nav className="space-y-1">
+            <motion.nav
+              className="space-y-1"
+              initial="hidden"
+              animate="visible"
+              variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.04 } } }}
+            >
               {sidebarLinks.map((link) => (
-                <Link
+                <motion.div
                   key={link.href}
+                  variants={{ hidden: { opacity: 0, x: -15 }, visible: { opacity: 1, x: 0 } }}
+                  whileHover={{ x: 3 }}
+                  transition={{ duration: 0.2 }}
+                >
+                <Link
                   href={link.href}
                   className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors hover:bg-accent"
                 >
                   <link.icon className="h-4 w-4" />
                   {link.label}
                 </Link>
+                </motion.div>
               ))}
+              <motion.div
+                variants={{ hidden: { opacity: 0, x: -15 }, visible: { opacity: 1, x: 0 } }}
+                whileHover={{ x: 3 }}
+                transition={{ duration: 0.2 }}
+              >
               <button
                 onClick={logout}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-accent"
@@ -92,12 +124,20 @@ export default function DashboardLayout({
                 <LogOut className="h-4 w-4" />
                 Cerrar Sesión
               </button>
-            </nav>
+              </motion.div>
+            </motion.nav>
           </div>
 
-          <div className="lg:col-span-3">{children}</div>
+          <motion.div
+            className="lg:col-span-3"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.3 }}
+          >
+            {children}
+          </motion.div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

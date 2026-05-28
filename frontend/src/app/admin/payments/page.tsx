@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function AdminPaymentsPage() {
@@ -34,13 +35,24 @@ export default function AdminPaymentsPage() {
   };
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <h2 className="text-2xl font-bold mb-6">Gestión de Pagos</h2>
 
-      <div className="flex gap-2 mb-6">
+      <motion.div
+        className="flex gap-2 mb-6"
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05, duration: 0.3 }}
+      >
         {["", "APPROVED", "PENDING", "REJECTED"].map((status) => (
-          <button
+          <motion.button
             key={status}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             onClick={() => setStatusFilter(status)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
               statusFilter === status
@@ -49,18 +61,28 @@ export default function AdminPaymentsPage() {
             }`}
           >
             {status ? (status === "APPROVED" ? "Aprobados" : status === "PENDING" ? "Pendientes" : "Rechazados") : "Todos"}
-          </button>
+          </motion.button>
         ))}
-      </div>
+      </motion.div>
 
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
         </div>
       ) : (
-        <div className="space-y-2">
+        <motion.div
+          className="space-y-2"
+          initial="hidden"
+          animate="visible"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.03 } } }}
+        >
           {data?.data.map((payment) => (
-            <Card key={payment.id}>
+            <motion.div
+              key={payment.id}
+              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+              whileHover={{ scale: 1.01, boxShadow: "0 0 20px rgba(0, 87, 255, 0.08)" }}
+            >
+            <Card>
               <CardContent className="flex items-center justify-between p-4">
                 <div>
                   <p className="font-semibold">{formatPrice(payment.amount, payment.currency)}</p>
@@ -88,12 +110,18 @@ export default function AdminPaymentsPage() {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {!loading && totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-6">
+        <motion.div
+          className="flex items-center justify-center gap-2 mt-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+        >
           <Button variant="outline" size="sm" onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -103,8 +131,8 @@ export default function AdminPaymentsPage() {
           <Button variant="outline" size="sm" onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}>
             <ChevronRight className="h-4 w-4" />
           </Button>
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }

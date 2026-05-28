@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
+import { motion } from "framer-motion";
 import { Database, Table, HardDrive, RefreshCw, CheckCircle, XCircle } from "lucide-react";
 
 export default function AdminDatabasePage() {
@@ -72,15 +73,35 @@ export default function AdminDatabasePage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <motion.div
+        className="flex items-center gap-3"
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.05, duration: 0.3 }}
+      >
         <Database className="h-6 w-6 text-primary" />
         <h2 className="text-2xl font-bold">Información de la Base de Datos</h2>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4"
+        initial="hidden"
+        animate="visible"
+        variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+      >
         {tables.map((table) => (
-          <Card key={table.name}>
+          <motion.div
+            key={table.name}
+            variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}
+            whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(0, 87, 255, 0.1)" }}
+          >
+          <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${table.color}`}>
@@ -95,9 +116,15 @@ export default function AdminDatabasePage() {
               <p className="text-xs text-muted-foreground mt-1">{table.description}</p>
             </CardContent>
           </Card>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.3 }}
+      >
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -138,6 +165,7 @@ export default function AdminDatabasePage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

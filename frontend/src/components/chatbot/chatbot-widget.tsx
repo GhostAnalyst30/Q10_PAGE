@@ -16,6 +16,13 @@ interface Message {
   text: string;
 }
 
+function mdToHtml(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br />');
+}
+
 export default function ChatBotWidget() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
@@ -109,7 +116,11 @@ export default function ChatBotWidget() {
                         : "bg-muted"
                     }`}
                   >
-                    {msg.text}
+                    {msg.role === "assistant" ? (
+                      <span dangerouslySetInnerHTML={{ __html: mdToHtml(msg.text) }} />
+                    ) : (
+                      msg.text
+                    )}
                   </div>
                 </motion.div>
               ))}

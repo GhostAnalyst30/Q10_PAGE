@@ -9,11 +9,11 @@ export function CurrencyToggle() {
   return (
     <button
       onClick={toggle}
-      className="flex items-center gap-1 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-medium hover:bg-accent transition-colors"
+      className="flex items-center gap-1 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
       title={`Mostrar en ${currency === "USD" ? "COP" : "USD"}`}
     >
       <DollarSign className="h-3.5 w-3.5" />
-      <span className={currency === "COP" ? "text-primary" : "text-blue-400"}>
+      <span className={currency === "COP" ? "text-primary" : "text-foreground"}>
         {currency}
       </span>
     </button>

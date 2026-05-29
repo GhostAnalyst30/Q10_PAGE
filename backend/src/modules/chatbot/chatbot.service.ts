@@ -7,7 +7,7 @@ export class ChatbotService {
   private readonly logger = new Logger(ChatbotService.name);
   // Lista de modelos gratuitos en OpenRouter (Mayo 2026)
   // Cambia por cualquiera de: mistralai/mistral-small-3.1-24b-instruct:free, deepseek/deepseek-chat-v3-0324:free, google/gemma-3-27b-it:free, openrouter/free
-  private readonly model = 'mistralai/mistral-small-3.1-24b-instruct:free';
+  private readonly model = 'google/gemma-4-26b-a4b-it:free';
 
   constructor(
     private prisma: PrismaService,

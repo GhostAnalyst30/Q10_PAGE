@@ -5,7 +5,9 @@ import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class ChatbotService {
   private readonly logger = new Logger(ChatbotService.name);
-  private readonly model = 'mistralai/mistral-7b-instruct';
+  // Lista de modelos gratuitos en OpenRouter (Mayo 2026)
+  // Cambia por cualquiera de: mistralai/mistral-small-3.1-24b-instruct:free, deepseek/deepseek-chat-v3-0324:free, google/gemma-3-27b-it:free, openrouter/free
+  private readonly model = 'mistralai/mistral-small-3.1-24b-instruct:free';
 
   constructor(
     private prisma: PrismaService,

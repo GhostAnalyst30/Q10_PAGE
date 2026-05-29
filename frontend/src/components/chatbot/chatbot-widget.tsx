@@ -46,10 +46,11 @@ export default function ChatBotWidget() {
 
       const res = await chatbotService.sendMessage(text, cartCourseIds);
       setMessages((prev) => [...prev, { role: "assistant", text: res.reply }]);
-    } catch {
+    } catch (err: any) {
+      const backendMsg = err?.response?.data?.message;
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", text: "Lo siento, no pude conectar con la IA. Verifica que OPENROUTER_API_KEY esté configurada." },
+        { role: "assistant", text: backendMsg || "Error de conexión con el servidor." },
       ]);
     } finally {
       setLoading(false);

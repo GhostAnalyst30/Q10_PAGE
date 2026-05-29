@@ -1,9 +1,10 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class ChatbotService {
+  private readonly logger = new Logger(ChatbotService.name);
   private readonly model = 'mistralai/mistral-7b-instruct';
 
   constructor(
@@ -17,6 +18,7 @@ export class ChatbotService {
 
   async recommend(cartCourseIds: string[], message: string) {
     const apiKey = this.configService.get('OPENROUTER_API_KEY');
+    this.logger.log(`OPENROUTER_API_KEY present: ${!!apiKey}`);
     if (!apiKey) {
       throw new HttpException(
         'OPENROUTER_API_KEY no configurada en el servidor',
@@ -85,6 +87,7 @@ Basado en esta informacion:
 
       const data = await response.json();
       if (!response.ok) {
+        this.logger.error(`OpenRouter HTTP ${response.status}: ${JSON.stringify(data)}`);
         throw new Error(data.error?.message || `HTTP ${response.status}`);
       }
 
@@ -93,8 +96,9 @@ Basado en esta informacion:
         model: this.model,
       };
     } catch (e) {
+      this.logger.error(`Chatbot error: ${(e as Error).message}`);
       throw new HttpException(
-        'Error al consultar la IA: ' + (e as Error).message,
+        (e as Error).message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

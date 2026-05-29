@@ -115,9 +115,6 @@ Basado en esta informacion:
       }
     }
 
-    throw new HttpException(
-      `Todos los modelos fallaron. Último error: ${lastError.message}`,
-      HttpStatus.INTERNAL_SERVER_ERROR,
-    );
+    return { reply: 'Lo siento, no pude resolver tu duda', model: 'none' };
   }
 }

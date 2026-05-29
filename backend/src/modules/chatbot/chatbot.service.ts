@@ -5,10 +5,12 @@ import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class ChatbotService {
   private readonly logger = new Logger(ChatbotService.name);
-  
-  // Se actualizó a un modelo gratuito altamente disponible y eficiente en OpenRouter
-  // Otras opciones viables: 'meta-llama/llama-3-8b-instruct:free' o el genérico 'openrouter/free'
-  private readonly model = 'google/gemma-2-9b-it:free';
+  private readonly models = [
+    'mistralai/mistral-small-3.1-24b-instruct:free',
+    'deepseek/deepseek-chat:free',
+    'openrouter/free',
+    'meta-llama/llama-3-8b-instruct:free',
+  ];
 
   constructor(
     private prisma: PrismaService,
@@ -66,44 +68,56 @@ Basado en esta informacion:
 - Siempre menciona el nombre exacto del curso que recomiendas.
 - Sé breve, máximo 3-4 oraciones.`;
 
-    try {
-      const response = await fetch(
-        'https://openrouter.ai/api/v1/chat/completions',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': this.configService.get('FRONTEND_URL', 'http://localhost:3000'),
+    const lastError = { message: '' };
+
+    for (const model of this.models) {
+      try {
+        const response = await fetch(
+          'https://openrouter.ai/api/v1/chat/completions',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': this.configService.get('FRONTEND_URL', 'http://localhost:3000'),
+            },
+            body: JSON.stringify({
+              model,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: message },
+              ],
+              max_tokens: 500,
+              temperature: 0.7,
+            }),
           },
-          body: JSON.stringify({
-            model: this.model,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: message },
-            ],
-            max_tokens: 500,
-            temperature: 0.7,
-          }),
-        },
-      );
+        );
 
-      const data = await response.json();
-      if (!response.ok) {
-        this.logger.error(`OpenRouter HTTP ${response.status}: ${JSON.stringify(data)}`);
-        throw new Error(data.error?.message || `HTTP ${response.status}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          this.logger.warn(`Modelo "${model}" falló (${response.status}): ${data.error?.message || 'sin detalle'}`);
+          lastError.message = data.error?.message || `HTTP ${response.status}`;
+          continue;
+        }
+
+        const reply = data.choices?.[0]?.message?.content;
+        if (!reply) {
+          this.logger.warn(`Modelo "${model}" respondió vacío`);
+          continue;
+        }
+
+        this.logger.log(`Respuesta exitosa con modelo: ${model}`);
+        return { reply, model };
+      } catch (e) {
+        this.logger.warn(`Modelo "${model}" lanzó excepción: ${(e as Error).message}`);
+        lastError.message = (e as Error).message;
       }
-
-      return {
-        reply: data.choices?.[0]?.message?.content || 'Lo siento, no pude generar una respuesta.',
-        model: this.model,
-      };
-    } catch (e) {
-      this.logger.error(`Chatbot error: ${(e as Error).message}`);
-      throw new HttpException(
-        (e as Error).message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
+
+    throw new HttpException(
+      `Todos los modelos fallaron. Último error: ${lastError.message}`,
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
   }
 }

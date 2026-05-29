@@ -48,6 +48,7 @@ model Course {
   description String
   shortDesc   String?
   price       Float
+  currency    String    @default("USD")
   thumbnail   String?
   category    String?
   instructor  String?

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,7 +14,13 @@ import { BookOpen, Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register } = useAuth();
+  const { user, register, loading: authLoading } = useAuth();
+
+  if (!authLoading && user) {
+    router.push("/dashboard/my-courses");
+    return null;
+  }
+  if (authLoading) return null;
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

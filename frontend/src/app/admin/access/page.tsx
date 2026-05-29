@@ -35,7 +35,7 @@ export default function AdminAccessPage() {
   async function handleCreateAdmin(key?: string) {
     setLoading(true);
     try {
-      await adminService.createAdmin(name, email, password, role, key);
+      await adminService.createAdmin(name, email, password, role, key!);
       toast.success("Administrador creado exitosamente");
       setName("");
       setEmail("");

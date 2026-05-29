@@ -5,12 +5,12 @@ export const paymentsService = {
   async createStripePayment(courseId: string) {
     const { data } = await api.post<{ url: string; sessionId: string }>(
       "/payments/create-stripe",
-      { courseId, gateway: "stripe" }
+      { courseId }
     );
     return data;
   },
 
-  async createWompiPayment(courseId: string) {
+  async createPsePayment(courseId: string) {
     const { data } = await api.post<{
       amount: number;
       currency: string;
@@ -19,7 +19,7 @@ export const paymentsService = {
       publicKey: string;
       redirectUrl: string;
       courseTitle: string;
-    }>("/payments/create-wompi", { courseId });
+    }>("/payments/create-pse", { courseId });
     return data;
   },
 

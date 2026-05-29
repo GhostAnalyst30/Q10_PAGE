@@ -21,6 +21,10 @@ export class CreateCourseDto {
 
   @IsOptional()
   @IsString()
+  currency?: string;
+
+  @IsOptional()
+  @IsString()
   thumbnail?: string;
 
   @IsOptional()

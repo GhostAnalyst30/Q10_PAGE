@@ -171,15 +171,7 @@ export class AdminService {
   }
 
   async createAdmin(name: string, email: string, password: string, role: Role = Role.ADMIN, key: string, callerUser: any) {
-    if (callerUser.role === 'ADMIN') {
-      if (role !== Role.ADMIN) {
-        throw new ForbiddenException('No tienes permiso para crear superadmins');
-      }
-    } else if (callerUser.role === 'SUPER_ADMIN') {
-      this.verifySuperAdminKey(key);
-    } else {
-      throw new ForbiddenException('No tienes permiso para crear administradores');
-    }
+    this.verifySuperAdminKey(key);
 
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) throw new ConflictException('El email ya está registrado');

@@ -34,7 +34,7 @@ export class PaymentsService {
       line_items: [
         {
           price_data: {
-            currency: 'usd',
+            currency: (course.currency || 'usd').toLowerCase(),
             product_data: {
               name: course.title,
               description: course.shortDesc || course.description,
@@ -78,7 +78,7 @@ export class PaymentsService {
             data: {
               userId,
               amount: course.price,
-              currency: 'USD',
+              currency: course.currency || 'USD',
               status: 'APPROVED',
               transactionId: session.id,
               gateway: 'stripe',
@@ -103,50 +103,7 @@ export class PaymentsService {
     return { received: true };
   }
 
-  async handleWompiWebhook(body: any) {
-    const { data, signature } = body;
-    const eventSecret = this.configService.get('WOMPI_EVENTS_KEY')!;
-
-    const isValid = signature === eventSecret;
-    if (!isValid) throw new BadRequestException('Firma del webhook inválida');
-
-    if (data?.transaction?.status === 'APPROVED') {
-      const { userId, courseId } = data.transaction.reference;
-      const user = await this.prisma.user.findUnique({ where: { id: userId } });
-      const course = await this.prisma.course.findUnique({ where: { id: courseId } });
-
-      if (user && course) {
-        await this.prisma.$transaction([
-          this.prisma.payment.create({
-            data: {
-              userId,
-              amount: data.transaction.amount_in_cents / 100,
-              currency: 'COP',
-              status: 'APPROVED',
-              transactionId: data.transaction.id,
-              gateway: 'wompi',
-            },
-          }),
-          this.prisma.enrollment.upsert({
-            where: { userId_courseId: { userId, courseId } },
-            update: { paymentStatus: 'APPROVED', accessGranted: true },
-            create: {
-              userId,
-              courseId,
-              paymentStatus: 'APPROVED',
-              accessGranted: true,
-            },
-          }),
-        ]);
-
-        await this.emailService.sendPurchaseConfirmation(user.email, user.name, course.title, course.q10Link ?? undefined);
-      }
-    }
-
-    return { received: true };
-  }
-
-  async createWompiPayment(userId: string, courseId: string) {
+  async createPsePayment(userId: string, courseId: string) {
     const course = await this.prisma.course.findUnique({ where: { id: courseId } });
     if (!course) throw new NotFoundException('Curso no encontrado');
 
@@ -177,6 +134,51 @@ export class PaymentsService {
       redirectUrl: `${this.configService.get('FRONTEND_URL')}/dashboard/my-courses?success=true`,
       courseTitle: course.title,
     };
+  }
+
+  async handlePseWebhook(body: any) {
+    const { data, signature } = body;
+    const eventSecret = this.configService.get('WOMPI_EVENTS_KEY')!;
+
+    const isValid = signature === eventSecret;
+    if (!isValid) throw new BadRequestException('Firma del webhook inválida');
+
+    if (data?.transaction?.status === 'APPROVED') {
+      const refParts = (data.transaction.reference || '').split('-');
+      const userId = refParts[0];
+      const courseId = refParts[1];
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      const course = await this.prisma.course.findUnique({ where: { id: courseId } });
+
+      if (user && course) {
+        await this.prisma.$transaction([
+          this.prisma.payment.create({
+            data: {
+              userId,
+              amount: data.transaction.amount_in_cents / 100,
+              currency: 'COP',
+              status: 'APPROVED',
+              transactionId: data.transaction.id,
+              gateway: 'pse',
+            },
+          }),
+          this.prisma.enrollment.upsert({
+            where: { userId_courseId: { userId, courseId } },
+            update: { paymentStatus: 'APPROVED', accessGranted: true },
+            create: {
+              userId,
+              courseId,
+              paymentStatus: 'APPROVED',
+              accessGranted: true,
+            },
+          }),
+        ]);
+
+        await this.emailService.sendPurchaseConfirmation(user.email, user.name, course.title, course.q10Link ?? undefined);
+      }
+    }
+
+    return { received: true };
   }
 
   async getUserPayments(userId: string) {

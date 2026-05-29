@@ -10,12 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { KeyConfirmDialog } from "@/components/admin/key-confirm-dialog";
-import { useCurrency } from "@/lib/currency-context";
+import { useCurrency, COP_RATE } from "@/lib/currency-context";
 import toast from "react-hot-toast";
 import { Plus, Pencil, Trash2, ExternalLink, DollarSign, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
-
-const COP_PRICE = 1;
 
 export default function AdminCoursesPage() {
   const { user } = useAuth();
@@ -27,7 +25,9 @@ export default function AdminCoursesPage() {
   const [keyDialogOpen, setKeyDialogOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<(key: string) => Promise<void>>();
   const [page, setPage] = useState(1);
-  const [pricingType, setPricingType] = useState<"USD" | "COP">("USD");
+  const [pricingType, setPricingType] = useState<string>("USD");
+  const [priceInput, setPriceInput] = useState("");
+  const [courseCurrency, setCourseCurrency] = useState("USD");
 
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
   const totalPages = data?.meta?.totalPages || 1;
@@ -67,8 +67,13 @@ export default function AdminCoursesPage() {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     let price = parseFloat(form.get("price") as string);
-    if (pricingType === "COP") {
-      price = COP_PRICE;
+    const currency = form.get("currency") as string || "USD";
+    if (pricingType !== currency) {
+      if (pricingType === "COP") {
+        price = price / COP_RATE;
+      } else if (currency === "COP") {
+        price = price * COP_RATE;
+      }
     }
 
     const courseData = {
@@ -77,6 +82,7 @@ export default function AdminCoursesPage() {
       description: form.get("description") as string,
       shortDesc: form.get("shortDesc") as string,
       price,
+      currency,
       category: form.get("category") as string,
       instructor: form.get("instructor") as string,
       whatYouLearn: form.get("whatYouLearn") as string,
@@ -123,6 +129,18 @@ export default function AdminCoursesPage() {
     setShowForm(true);
     setEditingCourse(null);
     setPricingType("USD");
+    setPriceInput("");
+    setCourseCurrency("USD");
+  }
+
+  function handlePricingTypeChange(type: string) {
+    const currentVal = parseFloat(priceInput) || 0;
+    if (type === "COP") {
+      setPriceInput((currentVal * COP_RATE).toFixed(0));
+    } else {
+      setPriceInput((currentVal / COP_RATE).toFixed(2));
+    }
+    setPricingType(type);
   }
 
   return (
@@ -170,27 +188,25 @@ export default function AdminCoursesPage() {
                     <input
                       name="price"
                       type="number"
-                      step="0.01"
-                      defaultValue={editingCourse?.price}
+                      step={pricingType === "COP" ? "1" : "0.01"}
+                      value={priceInput}
+                      onChange={(e) => setPriceInput(e.target.value)}
                       required
-                      disabled={pricingType === "COP"}
-                      className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm disabled:opacity-50"
+                      placeholder={pricingType === "COP" ? "Precio en COP" : "Precio en USD"}
+                      className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
                     />
                     <select
                       value={pricingType}
-                      onChange={(e) => setPricingType(e.target.value as "USD" | "COP")}
+                      onChange={(e) => handlePricingTypeChange(e.target.value)}
                       className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
                     >
                       <option value="USD">USD</option>
-                      <option value="COP">COP ($1)</option>
+                      <option value="COP">COP</option>
+                      <option value="EUR">EUR</option>
+                      <option value="MXN">MXN</option>
                     </select>
                   </div>
-                  {pricingType === "COP" && (
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <DollarSign className="h-3 w-3" />
-                      Curso configurado con precio de $1 COP para pruebas
-                    </p>
-                  )}
+                  <input type="hidden" name="currency" value={pricingType} />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Categoría</label>
@@ -244,7 +260,7 @@ export default function AdminCoursesPage() {
                       <div className="flex gap-2 mt-1">
                         {course.category && <Badge variant="secondary" className="text-xs">{course.category}</Badge>}
                         <Badge variant="outline" className="text-xs">
-                          {course.price === COP_PRICE ? "$1 COP" : format(course.price)}
+                          {format(course.price)}
                         </Badge>
                         {course.q10Link && (
                           <Badge variant="success" className="text-xs flex items-center gap-1">
@@ -255,7 +271,7 @@ export default function AdminCoursesPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => { setEditingCourse(course); setShowForm(true); setPricingType("USD"); }}>
+                    <Button variant="ghost" size="icon" onClick={() => { setEditingCourse(course); setShowForm(true); const c = course.currency || "USD"; setPricingType(c); setPriceInput(String(course.price)); setCourseCurrency(c); }}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     {isSuperAdmin && (

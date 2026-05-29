@@ -19,7 +19,7 @@ export default function CartPage() {
   const [cart, setCart] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
-  const [gateway, setGateway] = useState<"stripe" | "wompi">("stripe");
+  const [gateway, setGateway] = useState<"stripe" | "pse">("stripe");
 
   function loadCart() {
     setLoading(true);
@@ -51,11 +51,11 @@ export default function CartPage() {
     if (!cart?.items?.length) return;
     setPurchasing(true);
     try {
-      if (gateway === "wompi") {
-        const data = await paymentsService.createWompiPayment(cart.items[0].course.id);
-        toast.success("Redirigiendo a Wompi...");
-        const wompiUrl = `https://checkout.wompi.co/p/?public-key=${data.publicKey}&amount=${data.amount}&currency=COP&reference=${data.reference}&signature:integrity=${data.signature}&redirect-url=${data.redirectUrl}`;
-        window.location.href = wompiUrl;
+      if (gateway === "pse") {
+        const data = await paymentsService.createPsePayment(cart.items[0].course.id);
+        toast.success("Redirigiendo a PSE...");
+        const pseUrl = `https://checkout.wompi.co/p/?public-key=${data.publicKey}&amount=${data.amount}&currency=COP&reference=${data.reference}&signature:integrity=${data.signature}&redirect-url=${data.redirectUrl}&payment-method=PSE`;
+        window.location.href = pseUrl;
       } else {
         const { url } = await paymentsService.createStripePayment(cart.items[0].course.id);
         window.location.href = url;
@@ -145,21 +145,21 @@ export default function CartPage() {
                   onClick={() => setGateway("stripe")}
                   className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                     gateway === "stripe"
-                      ? "bg-primary text-white"
-                      : "bg-muted text-muted-foreground hover:bg-accent"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "border border-border text-foreground hover:bg-accent hover:text-accent-foreground"
                   }`}
                 >
                   Stripe (USD)
                 </button>
                 <button
-                  onClick={() => setGateway("wompi")}
+                  onClick={() => setGateway("pse")}
                   className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
-                    gateway === "wompi"
-                      ? "bg-primary text-white"
-                      : "bg-muted text-muted-foreground hover:bg-accent"
+                    gateway === "pse"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "border border-border text-foreground hover:bg-accent hover:text-accent-foreground"
                   }`}
                 >
-                  Wompi (COP)
+                  PSE (COP)
                 </button>
               </div>
 

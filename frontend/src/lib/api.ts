@@ -1,10 +1,28 @@
 import axios from "axios";
 
 const STORAGE_KEY = "q10_access_token";
+const COOKIE_NAME = "q10_at";
 let accessToken: string | null = null;
 
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+function setCookie(name: string, value: string, days: number) {
+  if (typeof document === "undefined") return;
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+function removeCookie(name: string) {
+  if (typeof document === "undefined") return;
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax`;
+}
+
 if (typeof window !== "undefined") {
-  accessToken = localStorage.getItem(STORAGE_KEY);
+  accessToken = getCookie(COOKIE_NAME) || localStorage.getItem(STORAGE_KEY);
 }
 
 export function setAccessToken(token: string | null) {
@@ -12,8 +30,10 @@ export function setAccessToken(token: string | null) {
   if (typeof window !== "undefined") {
     if (token) {
       localStorage.setItem(STORAGE_KEY, token);
+      setCookie(COOKIE_NAME, token, 7);
     } else {
       localStorage.removeItem(STORAGE_KEY);
+      removeCookie(COOKIE_NAME);
     }
   }
 }

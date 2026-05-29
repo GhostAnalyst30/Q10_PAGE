@@ -78,7 +78,7 @@ export class AdminController {
   }
 
   @Post('create-admin')
-  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN)
   createAdmin(
     @Body('name') name: string,
     @Body('email') email: string,

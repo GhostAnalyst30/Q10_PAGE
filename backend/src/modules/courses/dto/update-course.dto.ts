@@ -20,6 +20,10 @@ export class UpdateCourseDto {
 
   @IsOptional()
   @IsString()
+  currency?: string;
+
+  @IsOptional()
+  @IsString()
   thumbnail?: string;
 
   @IsOptional()

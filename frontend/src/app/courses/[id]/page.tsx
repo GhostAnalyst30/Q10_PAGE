@@ -47,7 +47,7 @@ export default function CourseDetailPage() {
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
-  const [gateway, setGateway] = useState<"stripe" | "wompi">("stripe");
+  const [gateway, setGateway] = useState<"stripe" | "pse">("stripe");
 
   useEffect(() => {
     coursesService.getBySlug(params.id as string).then((data) => {
@@ -64,11 +64,11 @@ export default function CourseDetailPage() {
 
     setPurchasing(true);
     try {
-      if (gateway === "wompi") {
-        const data = await paymentsService.createWompiPayment(course!.id);
-        toast.success("Redirigiendo a Wompi...");
-        const wompiUrl = `https://checkout.wompi.co/p/?public-key=${data.publicKey}&amount=${data.amount}&currency=COP&reference=${data.reference}&signature:integrity=${data.signature}&redirect-url=${data.redirectUrl}`;
-        window.location.href = wompiUrl;
+      if (gateway === "pse") {
+        const data = await paymentsService.createPsePayment(course!.id);
+        toast.success("Redirigiendo a PSE...");
+        const pseUrl = `https://checkout.wompi.co/p/?public-key=${data.publicKey}&amount=${data.amount}&currency=COP&reference=${data.reference}&signature:integrity=${data.signature}&redirect-url=${data.redirectUrl}&payment-method=PSE`;
+        window.location.href = pseUrl;
       } else {
         const { url } = await paymentsService.createStripePayment(course!.id);
         window.location.href = url;
@@ -207,21 +207,21 @@ export default function CourseDetailPage() {
                     onClick={() => setGateway("stripe")}
                     className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                       gateway === "stripe"
-                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white"
-                        : "bg-muted text-muted-foreground hover:bg-accent"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "border border-border text-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >
                     Stripe (USD)
                   </button>
                   <button
-                    onClick={() => setGateway("wompi")}
+                    onClick={() => setGateway("pse")}
                     className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
-                      gateway === "wompi"
-                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white"
-                        : "bg-muted text-muted-foreground hover:bg-accent"
+                      gateway === "pse"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "border border-border text-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >
-                    Wompi (COP)
+                    PSE (COP)
                   </button>
                 </div>
 
@@ -240,7 +240,7 @@ export default function CourseDetailPage() {
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
-                  Pago seguro con {gateway === "stripe" ? "Stripe" : "Wompi"}
+                  Pago seguro con {gateway === "stripe" ? "Stripe" : "PSE"}
                 </p>
 
                 <Separator className="my-6" />

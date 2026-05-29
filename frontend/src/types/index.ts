@@ -20,6 +20,7 @@ export interface Course {
   description: string;
   shortDesc?: string;
   price: number;
+  currency: string;
   thumbnail?: string;
   category?: string;
   instructor?: string;

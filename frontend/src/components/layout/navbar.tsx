@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CurrencyToggle } from "@/components/currency-toggle";
+import { cartService } from "@/services/cart.service";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
@@ -26,6 +27,9 @@ export function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [cartData, setCartData] = useState<{ count: number; items: { course: { slug: string; title: string } }[] } | null>(null);
+  const [cartHover, setCartHover] = useState(false);
+  const cartTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const isAdmin = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
 
@@ -36,6 +40,26 @@ export function Navbar() {
   ];
 
   const isActive = (href: string) => pathname === href;
+
+  useEffect(() => {
+    if (user) {
+      cartService.getCart().then((data) => setCartData(data)).catch(() => {});
+    } else {
+      setCartData(null);
+    }
+  }, [user]);
+
+  function handleCartMouseEnter() {
+    if (cartTimeoutRef.current) clearTimeout(cartTimeoutRef.current);
+    setCartHover(true);
+    if (user) {
+      cartService.getCart().then((data) => setCartData(data)).catch(() => {});
+    }
+  }
+
+  function handleCartMouseLeave() {
+    cartTimeoutRef.current = setTimeout(() => setCartHover(false), 200);
+  }
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
@@ -69,12 +93,69 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             <CurrencyToggle />
             {user && (
-              <Link
-                href="/dashboard/cart"
-                className="relative p-2 text-muted-foreground hover:text-foreground transition-colors"
+              <div
+                className="relative"
+                onMouseEnter={handleCartMouseEnter}
+                onMouseLeave={handleCartMouseLeave}
               >
-                <ShoppingCart className="h-5 w-5" />
-              </Link>
+                <Link
+                  href="/dashboard/cart"
+                  className="relative p-2 text-muted-foreground hover:text-foreground transition-colors inline-flex items-center"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartData && cartData.count > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white px-1">
+                      {cartData.count > 99 ? "99+" : cartData.count}
+                    </span>
+                  )}
+                </Link>
+
+                <AnimatePresence>
+                  {cartHover && cartData && cartData.count > 0 && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setCartHover(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: -5 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -5 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 top-full mt-2 z-20 w-72 rounded-xl border border-border bg-card p-2 shadow-lg"
+                      >
+                        <p className="text-xs font-medium text-muted-foreground px-2 py-1">
+                          Carrito ({cartData.count} curso{cartData.count !== 1 ? "s" : ""})
+                        </p>
+                        <Separator className="my-1" />
+                        <div className="max-h-60 overflow-y-auto">
+                          {cartData.items.map((item: any) => (
+                            <Link
+                              key={item.id}
+                              href={`/courses/${item.course.slug}`}
+                              onClick={() => setCartHover(false)}
+                              className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm hover:bg-accent transition-colors"
+                            >
+                              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold shrink-0">
+                                {item.course.title.charAt(0)}
+                              </div>
+                              <span className="truncate">{item.course.title}</span>
+                            </Link>
+                          ))}
+                        </div>
+                        <Separator className="my-1" />
+                        <Link
+                          href="/dashboard/cart"
+                          onClick={() => setCartHover(false)}
+                          className="flex items-center justify-center rounded-lg px-2 py-2 text-xs font-medium text-primary hover:bg-accent transition-colors"
+                        >
+                          Ir al carrito
+                        </Link>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
             )}
             {user ? (
               <div className="relative">
@@ -212,6 +293,9 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <div className="px-3 py-2">
+                <CurrencyToggle />
+              </div>
               <Separator className="my-2" />
               {user ? (
                 <>
@@ -221,6 +305,19 @@ export function Navbar() {
                     className="rounded-lg px-3 py-2 text-sm block"
                   >
                     Dashboard
+                  </Link>
+                  <Link
+                    href="/dashboard/cart"
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-lg px-3 py-2 text-sm flex items-center gap-2"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    Carrito
+                    {cartData && cartData.count > 0 && (
+                      <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white px-1.5">
+                        {cartData.count}
+                      </span>
+                    )}
                   </Link>
                   <Link
                     href="/dashboard/profile"

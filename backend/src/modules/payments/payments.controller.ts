@@ -31,13 +31,13 @@ export class PaymentsController {
     return this.paymentsService.createStripePayment(userId, dto.courseId);
   }
 
-  @Post('create-wompi')
+  @Post('create-pse')
   @UseGuards(JwtAuthGuard)
-  createWompiPayment(
+  createPsePayment(
     @CurrentUser('id') userId: string,
     @Body() dto: CreatePaymentDto,
   ) {
-    return this.paymentsService.createWompiPayment(userId, dto.courseId);
+    return this.paymentsService.createPsePayment(userId, dto.courseId);
   }
 
   @Post('webhook/stripe')
@@ -48,9 +48,9 @@ export class PaymentsController {
     return this.paymentsService.handleStripeWebhook(req.rawBody!, signature);
   }
 
-  @Post('webhook/wompi')
-  handleWompiWebhook(@Body() body: any) {
-    return this.paymentsService.handleWompiWebhook(body);
+  @Post('webhook/pse')
+  handlePseWebhook(@Body() body: any) {
+    return this.paymentsService.handlePseWebhook(body);
   }
 
   @Get('my-payments')

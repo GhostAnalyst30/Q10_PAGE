@@ -12,7 +12,7 @@ const sidebarLinks = [
   { href: "/admin/users", label: "Usuarios", icon: Users, adminOnly: false },
   { href: "/admin/courses", label: "Cursos", icon: BookOpen, adminOnly: false },
   { href: "/admin/payments", label: "Pagos", icon: CreditCard, adminOnly: false },
-  { href: "/admin/access", label: "Accesos", icon: UserPlus, adminOnly: false },
+  { href: "/admin/access", label: "Accesos", icon: UserPlus, adminOnly: true },
   { href: "/admin/create-user", label: "Crear Usuario", icon: UserCog, adminOnly: true },
   { href: "/admin/realtime", label: "Tiempo Real", icon: Activity, adminOnly: true },
   { href: "/admin/database", label: "Base de Datos", icon: Database, adminOnly: true },

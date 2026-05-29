@@ -5,5 +5,5 @@ export class CreatePaymentDto {
   courseId: string;
 
   @IsString()
-  gateway: 'stripe' | 'wompi';
+  gateway: 'stripe' | 'pse';
 }

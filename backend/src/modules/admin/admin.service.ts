@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
+import { AuditService } from '../audit/audit.service';
 import { Role } from '@prisma/client';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class AdminService {
     private prisma: PrismaService,
     private configService: ConfigService,
     private emailService: EmailService,
+    private auditService: AuditService,
   ) {}
 
   private verifySuperAdminKey(key: string) {
@@ -18,6 +20,21 @@ export class AdminService {
     if (key !== validKey) {
       throw new ForbiddenException('Clave de seguridad incorrecta');
     }
+  }
+
+  private async audit(caller: any, action: string, entity: string, entityId?: string, details?: string, snapshot?: string) {
+    if (!caller) return;
+    await this.auditService.log({
+      userId: caller.id,
+      userName: caller.name,
+      userEmail: caller.email,
+      userRole: caller.role,
+      action,
+      entity,
+      entityId,
+      details,
+      snapshot,
+    }).catch(() => {});
   }
 
   async verifyKey(key: string) {
@@ -117,7 +134,7 @@ export class AdminService {
     return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
-  async updateUserRole(userId: string, role: Role, key?: string) {
+  async updateUserRole(userId: string, role: Role, key?: string, caller?: any) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
@@ -125,14 +142,17 @@ export class AdminService {
       this.verifySuperAdminKey(key);
     }
 
-    return this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id: userId },
       data: { role },
       select: { id: true, name: true, email: true, role: true },
     });
+
+    await this.audit(caller, 'update_role', 'user', userId, `Rol cambiado de ${user.role} a ${role} (${updated.name})`, JSON.stringify({ previousRole: user.role }));
+    return updated;
   }
 
-  async toggleUserStatus(userId: string, key?: string) {
+  async toggleUserStatus(userId: string, key?: string, caller?: any) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
@@ -140,24 +160,31 @@ export class AdminService {
       this.verifySuperAdminKey(key);
     }
 
-    return this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id: userId },
       data: { isActive: !user.isActive },
       select: { id: true, name: true, email: true, isActive: true },
     });
+
+    const status = updated.isActive ? 'activado' : 'suspendido';
+    await this.audit(caller, 'toggle_status', 'user', userId, `Usuario ${status}: ${updated.name}`, JSON.stringify({ previousStatus: user.isActive }));
+    return updated;
   }
 
-  async createUser(name: string, email: string, password: string, key: string) {
+  async createUser(name: string, email: string, password: string, key: string, caller?: any) {
     this.verifySuperAdminKey(key);
 
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) throw new ConflictException('El email ya está registrado');
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    return this.prisma.user.create({
+    const created = await this.prisma.user.create({
       data: { name, email, password: hashedPassword, role: Role.USER },
       select: { id: true, name: true, email: true, role: true },
     });
+
+    await this.audit(caller, 'create_user', 'user', created.id, `Usuario creado: ${name} (${email})`, JSON.stringify({ userId: created.id }));
+    return created;
   }
 
   async getUsersByRegistration() {
@@ -177,13 +204,16 @@ export class AdminService {
     if (existing) throw new ConflictException('El email ya está registrado');
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    return this.prisma.user.create({
+    const created = await this.prisma.user.create({
       data: { name, email, password: hashedPassword, role },
       select: { id: true, name: true, email: true, role: true },
     });
+
+    await this.audit(callerUser, 'create_admin', 'user', created.id, `Admin creado: ${name} (${email}) rol: ${role}`, JSON.stringify({ userId: created.id }));
+    return created;
   }
 
-  async updateCourse(id: string, data: any, key?: string) {
+  async updateCourse(id: string, data: any, key?: string, caller?: any) {
     const course = await this.prisma.course.findUnique({ where: { id } });
     if (!course) throw new NotFoundException('Curso no encontrado');
 
@@ -191,13 +221,19 @@ export class AdminService {
       this.verifySuperAdminKey(key);
     }
 
-    return this.prisma.course.update({
+    const updated = await this.prisma.course.update({
       where: { id },
       data,
     });
+
+    const changed = Object.keys(data).filter(k => data[k] !== undefined && data[k] !== (course as any)[k]).join(', ');
+    const previous: any = {};
+    for (const k of Object.keys(data)) { previous[k] = (course as any)[k]; }
+    await this.audit(caller, 'update_course', 'course', id, `Curso actualizado: ${updated.title}. Cambios: ${changed || 'varios'}`, JSON.stringify({ previous }));
+    return updated;
   }
 
-  async deleteUser(userId: string, key: string) {
+  async deleteUser(userId: string, key: string, caller?: any) {
     this.verifySuperAdminKey(key);
 
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
@@ -207,20 +243,22 @@ export class AdminService {
     }
 
     await this.prisma.user.delete({ where: { id: userId } });
+    await this.audit(caller, 'delete_user', 'user', userId, `Usuario eliminado: ${user.name} (${user.email})`, JSON.stringify({ user: { name: user.name, email: user.email } }));
     return { message: 'Usuario eliminado permanentemente' };
   }
 
-  async sendCredentialEmail(userId: string, key: string) {
+  async sendCredentialEmail(userId: string, key: string, caller?: any) {
     this.verifySuperAdminKey(key);
 
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
     await this.emailService.sendCredentialEmail(user.email, user.name);
+    await this.audit(caller, 'send_credentials', 'user', userId, `Credenciales enviadas a: ${user.email}`);
     return { message: 'Correo de credenciales enviado' };
   }
 
-  async sendCredentialEmailWithPassword(userId: string, password: string, key: string) {
+  async sendCredentialEmailWithPassword(userId: string, password: string, key: string, caller?: any) {
     this.verifySuperAdminKey(key);
 
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
@@ -233,36 +271,43 @@ export class AdminService {
     });
 
     await this.emailService.sendCredentialEmail(user.email, user.name, password);
+    await this.audit(caller, 'send_credentials_password', 'user', userId, `Credenciales con contraseña enviadas a: ${user.email}`);
     return { message: 'Correo de credenciales enviado con contraseña' };
   }
 
-  async updateQ10Link(courseId: string, q10Link: string, key: string) {
+  async updateQ10Link(courseId: string, q10Link: string, key: string, caller?: any) {
     this.verifySuperAdminKey(key);
 
     const course = await this.prisma.course.findUnique({ where: { id: courseId } });
     if (!course) throw new NotFoundException('Curso no encontrado');
 
-    return this.prisma.course.update({
+    const updated = await this.prisma.course.update({
       where: { id: courseId },
       data: { q10Link },
       select: { id: true, title: true, q10Link: true },
     });
+
+    await this.audit(caller, 'update_q10_link', 'course', courseId, `Q10 link actualizado para: ${updated.title}`);
+    return updated;
   }
 
-  async updateQ10UserCredentials(userId: string, q10User: string, q10Pass: string, key: string) {
+  async updateQ10UserCredentials(userId: string, q10User: string, q10Pass: string, key: string, caller?: any) {
     this.verifySuperAdminKey(key);
 
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
-    return this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id: userId },
       data: { q10User, q10Pass },
       select: { id: true, name: true, email: true, q10User: true, q10Pass: true },
     });
+
+    await this.audit(caller, 'update_q10_credentials', 'user', userId, `Credenciales Q10 actualizadas para: ${updated.name}`);
+    return updated;
   }
 
-  async sendQ10CredentialsEmail(userId: string, key: string) {
+  async sendQ10CredentialsEmail(userId: string, key: string, caller?: any) {
     this.verifySuperAdminKey(key);
 
     const user = await this.prisma.user.findUnique({
@@ -285,6 +330,7 @@ export class AdminService {
     }));
 
     await this.emailService.sendQ10CredentialsEmail(user.email, user.name, user.q10User, user.q10Pass, courses);
+    await this.audit(caller, 'send_q10_credentials', 'user', userId, `Credenciales Q10 enviadas a: ${user.email}`);
     return { message: 'Credenciales Q10 enviadas por correo' };
   }
 }

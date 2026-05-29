@@ -51,16 +51,18 @@ export class AdminController {
     @Param('id') id: string,
     @Body('role') role: Role,
     @Body('key') key?: string,
+    @CurrentUser() caller?: any,
   ) {
-    return this.adminService.updateUserRole(id, role, key);
+    return this.adminService.updateUserRole(id, role, key, caller);
   }
 
   @Patch('users/:id/toggle-status')
   toggleUserStatus(
     @Param('id') id: string,
     @Body('key') key?: string,
+    @CurrentUser() caller?: any,
   ) {
-    return this.adminService.toggleUserStatus(id, key);
+    return this.adminService.toggleUserStatus(id, key, caller);
   }
 
   @Delete('users/:id')
@@ -68,8 +70,9 @@ export class AdminController {
   deleteUser(
     @Param('id') id: string,
     @Body('key') key: string,
+    @CurrentUser() caller?: any,
   ) {
-    return this.adminService.deleteUser(id, key);
+    return this.adminService.deleteUser(id, key, caller);
   }
 
   @Get('users/comparison')
@@ -97,8 +100,9 @@ export class AdminController {
     @Body('email') email: string,
     @Body('password') password: string,
     @Body('key') key: string,
+    @CurrentUser() caller?: any,
   ) {
-    return this.adminService.createUser(name, email, password, key);
+    return this.adminService.createUser(name, email, password, key, caller);
   }
 
   @Post('send-credentials/:userId')
@@ -106,8 +110,9 @@ export class AdminController {
   sendCredentials(
     @Param('userId') userId: string,
     @Body('key') key: string,
+    @CurrentUser() caller?: any,
   ) {
-    return this.adminService.sendCredentialEmail(userId, key);
+    return this.adminService.sendCredentialEmail(userId, key, caller);
   }
 
   @Patch('courses/:id')
@@ -115,9 +120,10 @@ export class AdminController {
     @Param('id') id: string,
     @Body() data: any,
     @Body('key') key?: string,
+    @CurrentUser() caller?: any,
   ) {
     const { key: _, ...courseData } = data;
-    return this.adminService.updateCourse(id, courseData, key);
+    return this.adminService.updateCourse(id, courseData, key, caller);
   }
 
   @Patch('courses/:id/q10-link')
@@ -126,8 +132,9 @@ export class AdminController {
     @Param('id') id: string,
     @Body('q10Link') q10Link: string,
     @Body('key') key: string,
+    @CurrentUser() caller?: any,
   ) {
-    return this.adminService.updateQ10Link(id, q10Link, key);
+    return this.adminService.updateQ10Link(id, q10Link, key, caller);
   }
 
   @Patch('users/:id/q10-credentials')
@@ -137,8 +144,9 @@ export class AdminController {
     @Body('q10User') q10User: string,
     @Body('q10Pass') q10Pass: string,
     @Body('key') key: string,
+    @CurrentUser() caller?: any,
   ) {
-    return this.adminService.updateQ10UserCredentials(id, q10User, q10Pass, key);
+    return this.adminService.updateQ10UserCredentials(id, q10User, q10Pass, key, caller);
   }
 
   @Post('send-q10-credentials/:userId')
@@ -146,8 +154,9 @@ export class AdminController {
   sendQ10Credentials(
     @Param('userId') userId: string,
     @Body('key') key: string,
+    @CurrentUser() caller?: any,
   ) {
-    return this.adminService.sendQ10CredentialsEmail(userId, key);
+    return this.adminService.sendQ10CredentialsEmail(userId, key, caller);
   }
 
   @Post('send-credentials-password/:userId')
@@ -156,7 +165,8 @@ export class AdminController {
     @Param('userId') userId: string,
     @Body('password') password: string,
     @Body('key') key: string,
+    @CurrentUser() caller?: any,
   ) {
-    return this.adminService.sendCredentialEmailWithPassword(userId, password, key);
+    return this.adminService.sendCredentialEmailWithPassword(userId, password, key, caller);
   }
 }

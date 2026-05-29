@@ -127,3 +127,24 @@ model PasswordReset {
   @@index([email])
   @@index([token])
 }
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  userName  String
+  userEmail String
+  userRole  String
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  snapshot  String?
+  undoneAt  DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity])
+  @@index([action])
+  @@index([createdAt])
+  @@index([undoneAt])
+}

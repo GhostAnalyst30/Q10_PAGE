@@ -17,14 +17,14 @@ export default function LoginPage() {
   const { user, login, loading: authLoading } = useAuth();
 
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   if (authLoading) return null;
   if (user) {
     router.push("/dashboard/my-courses");
     return null;
   }
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

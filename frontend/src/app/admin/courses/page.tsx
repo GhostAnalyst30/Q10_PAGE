@@ -83,6 +83,7 @@ export default function AdminCoursesPage() {
       shortDesc: form.get("shortDesc") as string,
       price,
       currency,
+      thumbnail: form.get("thumbnail") as string || undefined,
       category: form.get("category") as string,
       instructor: form.get("instructor") as string,
       whatYouLearn: form.get("whatYouLearn") as string,
@@ -215,6 +216,10 @@ export default function AdminCoursesPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Instructor</label>
                   <input name="instructor" defaultValue={editingCourse?.instructor} className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">URL de la Imagen (thumbnail)</label>
+                  <input name="thumbnail" defaultValue={editingCourse?.thumbnail} placeholder="https://ejemplo.com/imagen.jpg" className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">¿Qué aprenderá?</label>

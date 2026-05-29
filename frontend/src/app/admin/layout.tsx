@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Shield, Users, BookOpen, CreditCard, BarChart3, UserPlus, UserCog, Database, Activity, History } from "lucide-react";
+import { Shield, Users, BookOpen, CreditCard, BarChart3, UserPlus, UserCog, Database, Activity, History, Settings } from "lucide-react";
 
 const sidebarLinks = [
   { href: "/admin", label: "Estadísticas", icon: BarChart3, adminOnly: false },
@@ -13,6 +13,7 @@ const sidebarLinks = [
   { href: "/admin/courses", label: "Cursos", icon: BookOpen, adminOnly: false },
   { href: "/admin/payments", label: "Pagos", icon: CreditCard, adminOnly: false },
   { href: "/admin/audit", label: "Historial", icon: History, adminOnly: false },
+  { href: "/admin/settings", label: "Configuración", icon: Settings, adminOnly: false },
   { href: "/admin/access", label: "Accesos", icon: UserPlus, adminOnly: true },
   { href: "/admin/create-user", label: "Crear Usuario", icon: UserCog, adminOnly: true },
   { href: "/admin/realtime", label: "Tiempo Real", icon: Activity, adminOnly: true },

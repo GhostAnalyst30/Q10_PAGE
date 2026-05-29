@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { KeyConfirmDialog } from "@/components/admin/key-confirm-dialog";
-import { useCurrency, COP_RATE } from "@/lib/currency-context";
+import { useCurrency, getRate, convertPrice } from "@/lib/currency-context";
 import toast from "react-hot-toast";
 import { Plus, Pencil, Trash2, ExternalLink, DollarSign, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
@@ -25,9 +25,10 @@ export default function AdminCoursesPage() {
   const [keyDialogOpen, setKeyDialogOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<(key: string) => Promise<void>>();
   const [page, setPage] = useState(1);
-  const [pricingType, setPricingType] = useState<string>("USD");
-  const [priceInput, setPriceInput] = useState("");
-  const [courseCurrency, setCourseCurrency] = useState("USD");
+  const [priceUsd, setPriceUsd] = useState("");
+  const [priceCop, setPriceCop] = useState("");
+  const [priceEur, setPriceEur] = useState("");
+  const [priceMxn, setPriceMxn] = useState("");
 
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
   const totalPages = data?.meta?.totalPages || 1;
@@ -66,15 +67,7 @@ export default function AdminCoursesPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
-    let price = parseFloat(form.get("price") as string);
-    const currency = form.get("currency") as string || "USD";
-    if (pricingType !== currency) {
-      if (pricingType === "COP") {
-        price = price / COP_RATE;
-      } else if (currency === "COP") {
-        price = price * COP_RATE;
-      }
-    }
+    const price = parseFloat(form.get("price") as string) || 0;
 
     const courseData = {
       title: form.get("title") as string,
@@ -82,7 +75,7 @@ export default function AdminCoursesPage() {
       description: form.get("description") as string,
       shortDesc: form.get("shortDesc") as string,
       price,
-      currency,
+      currency: "USD",
       thumbnail: form.get("thumbnail") as string || undefined,
       category: form.get("category") as string,
       instructor: form.get("instructor") as string,
@@ -129,19 +122,19 @@ export default function AdminCoursesPage() {
   function resetForm() {
     setShowForm(true);
     setEditingCourse(null);
-    setPricingType("USD");
-    setPriceInput("");
-    setCourseCurrency("USD");
+    setPriceUsd("");
+    setPriceCop("");
+    setPriceEur("");
+    setPriceMxn("");
   }
 
-  function handlePricingTypeChange(type: string) {
-    const currentVal = parseFloat(priceInput) || 0;
-    if (type === "COP") {
-      setPriceInput((currentVal * COP_RATE).toFixed(0));
-    } else {
-      setPriceInput((currentVal / COP_RATE).toFixed(2));
-    }
-    setPricingType(type);
+  function handlePriceChange(changedCurrency: string, value: string) {
+    const numeric = parseFloat(value) || 0;
+    const c = changedCurrency as "USD" | "COP" | "EUR" | "MXN";
+    setPriceUsd(value === "" ? "" : convertPrice(numeric, c, "USD").toFixed(2));
+    setPriceCop(value === "" ? "" : String(Math.round(convertPrice(numeric, c, "COP"))));
+    setPriceEur(value === "" ? "" : convertPrice(numeric, c, "EUR").toFixed(2));
+    setPriceMxn(value === "" ? "" : convertPrice(numeric, c, "MXN").toFixed(2));
   }
 
   return (
@@ -183,31 +176,56 @@ export default function AdminCoursesPage() {
                   <label className="text-sm font-medium">Descripción Corta</label>
                   <input name="shortDesc" defaultValue={editingCourse?.shortDesc} className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Precio</label>
-                  <div className="flex gap-2">
-                    <input
-                      name="price"
-                      type="number"
-                      step={pricingType === "COP" ? "1" : "0.01"}
-                      value={priceInput}
-                      onChange={(e) => setPriceInput(e.target.value)}
-                      required
-                      placeholder={pricingType === "COP" ? "Precio en COP" : "Precio en USD"}
-                      className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
-                    />
-                    <select
-                      value={pricingType}
-                      onChange={(e) => handlePricingTypeChange(e.target.value)}
-                      className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
-                    >
-                      <option value="USD">USD</option>
-                      <option value="COP">COP</option>
-                      <option value="EUR">EUR</option>
-                      <option value="MXN">MXN</option>
-                    </select>
+                <div className="space-y-3 md:col-span-2">
+                  <label className="text-sm font-medium">Precio en múltiples monedas</label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <div>
+                      <label className="text-xs text-muted-foreground">USD</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={priceUsd}
+                        onChange={(e) => handlePriceChange("USD", e.target.value)}
+                        placeholder="0.00"
+                        className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">COP</label>
+                      <input
+                        type="number"
+                        step="1"
+                        value={priceCop}
+                        onChange={(e) => handlePriceChange("COP", e.target.value)}
+                        placeholder="0"
+                        className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">EUR</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={priceEur}
+                        onChange={(e) => handlePriceChange("EUR", e.target.value)}
+                        placeholder="0.00"
+                        className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">MXN</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={priceMxn}
+                        onChange={(e) => handlePriceChange("MXN", e.target.value)}
+                        placeholder="0.00"
+                        className="flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
+                      />
+                    </div>
                   </div>
-                  <input type="hidden" name="currency" value={pricingType} />
+                  <input type="hidden" name="price" value={priceUsd} />
+                  <input type="hidden" name="currency" value="USD" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Categoría</label>
@@ -276,7 +294,7 @@ export default function AdminCoursesPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => { setEditingCourse(course); setShowForm(true); const c = course.currency || "USD"; setPricingType(c); setPriceInput(String(course.price)); setCourseCurrency(c); }}>
+                    <Button variant="ghost" size="icon" onClick={() => { setEditingCourse(course); setShowForm(true); const price = course.price; setPriceUsd(price.toFixed(2)); setPriceCop(String(Math.round(price * getRate("COP")))); setPriceEur((price * getRate("EUR")).toFixed(2)); setPriceMxn((price * getRate("MXN")).toFixed(2)); }}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     {isSuperAdmin && (

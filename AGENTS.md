@@ -41,6 +41,7 @@ npm run dev           # Development on :3000
 - EMAIL_FROM - Sender email (ej. noreply@tudominio.com)
 - EMAIL_FROM_NAME - Sender name (ej. Q10 Courses)
 - FRONTEND_URL - Frontend URL for CORS
+- OPENROUTER_API_KEY - API key for AI chatbot (https://openrouter.ai/keys, modelo gratuito mistral-7b-instruct)
 
 ### Frontend (.env.local)
 - NEXT_PUBLIC_API_URL - Backend API URL
@@ -59,6 +60,8 @@ npm run dev           # Development on :3000
 - "Sobre Nosotros" page at /about
 - Superadmin cannot be deleted (backend protection)
 - Real-time stats with React Query polling
+- Exchange rates: Admin panel at /admin/settings to view/edit COP, EUR, MXN rates vs USD, with auto-fetch from open.er-api.com
+- AI Chatbot: Floating widget (bottom-right) powered by OpenRouter (free model mistral-7b-instruct). Recommends complementary courses based on cart contents. Name configurable in frontend/src/components/chatbot/chatbot-widget.tsx
 
 ## Deploy
 - Frontend: Vercel

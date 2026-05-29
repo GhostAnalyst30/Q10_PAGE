@@ -10,6 +10,8 @@ import { EmailModule } from './modules/email/email.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { CartModule } from './modules/cart/cart.module';
 import { AuditModule } from './modules/audit/audit.module';
+import { SettingsModule } from './modules/settings/settings.module';
+import { ChatbotModule } from './modules/chatbot/chatbot.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { AuditModule } from './modules/audit/audit.module';
     AdminModule,
     CartModule,
     AuditModule,
+    SettingsModule,
+    ChatbotModule,
   ],
 })
 export class AppModule {}

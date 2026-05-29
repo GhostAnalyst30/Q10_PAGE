@@ -114,7 +114,10 @@ export class PaymentsService {
       throw new BadRequestException('Ya tienes acceso a este curso');
     }
 
-    const amountInCents = Math.round(course.price * 100);
+    const rate = await this.prisma.exchangeRate.findUnique({ where: { currency: 'COP' } });
+    const COP_RATE = rate?.rate ?? 4200;
+    const priceInCop = Math.round(course.price * COP_RATE);
+    const amountInCents = Math.round(priceInCop);
 
     const reference = `${userId}-${courseId}-${Date.now()}`;
     const integritySecret = this.configService.get('WOMPI_INTEGRITY_SECRET') || '';

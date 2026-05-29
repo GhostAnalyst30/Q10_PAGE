@@ -15,16 +15,16 @@ import { BookOpen, Loader2 } from "lucide-react";
 export default function RegisterPage() {
   const router = useRouter();
   const { user, register, loading: authLoading } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   if (!authLoading && user) {
     router.push("/dashboard/my-courses");
     return null;
   }
   if (authLoading) return null;
-  const [loading, setLoading] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
